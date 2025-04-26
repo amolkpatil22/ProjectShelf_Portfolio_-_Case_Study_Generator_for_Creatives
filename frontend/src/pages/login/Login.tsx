@@ -10,52 +10,28 @@ import {
     VStack,
     Text,
     Link,
-    useToast,
     InputGroup,
     InputRightElement,
     IconButton,
     Flex,
+    Alert,
+    AlertIcon,
 } from '@chakra-ui/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import { useLogin } from './hooks/useLogin';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        try {
-            // TODO: Implement actual login logic here
-            // For now, just simulate a successful login
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            toast({
-                title: 'Login successful',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            });
-
-            navigate('/builder');
-        } catch (error) {
-            toast({
-                title: 'Login failed',
-                description: 'Please check your credentials and try again.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        isLoading,
+        error,
+        handleLogin,
+    } = useLogin();
 
     return (
         <Box minH="100vh" bg="gray.50" py={20}>
@@ -83,7 +59,14 @@ const Login = () => {
                             </Text>
                         </VStack>
 
-                        <Box as="form" onSubmit={handleSubmit} width="full">
+                        {error && (
+                            <Alert status="error" borderRadius="md">
+                                <AlertIcon />
+                                {error}
+                            </Alert>
+                        )}
+
+                        <Box as="form" onSubmit={handleLogin} width="full">
                             <VStack spacing={6}>
                                 <FormControl isRequired>
                                     <FormLabel>Email</FormLabel>

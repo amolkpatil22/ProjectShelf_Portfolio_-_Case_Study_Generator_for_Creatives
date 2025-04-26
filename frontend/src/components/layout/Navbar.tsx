@@ -19,6 +19,7 @@ const Navbar = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const location = useLocation();
   const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -30,6 +31,14 @@ const Navbar = () => {
       // If on another page, navigate to home page
       navigate('/');
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isLoggedIn');
+    navigate('/login');
   };
 
   return (
@@ -84,7 +93,9 @@ const Navbar = () => {
               <ChakraLink as={RouterLink} to="/#themes">Themes</ChakraLink>
               <ChakraLink as={RouterLink} to="/#analytics">Analytics</ChakraLink>
               <ChakraLink as={RouterLink} to="/#pricing">Pricing</ChakraLink>
-              <ChakraLink as={RouterLink} to="/builder" color="primary.400">Portfolio Builder</ChakraLink>
+              {isLoggedIn && (
+                <ChakraLink as={RouterLink} to="/builder" color="primary.400">Portfolio Builder</ChakraLink>
+              )}
             </Stack>
           </Flex>
 
@@ -94,12 +105,39 @@ const Navbar = () => {
             spacing={4}
             alignItems="center"
           >
-            <Button variant="outline" size="md">
-              Log In
-            </Button>
-            <Button variant="solid" size="md">
-              Sign Up Free
-            </Button>
+            {isLoggedIn ? (
+              <Button
+                variant="outline"
+                size="md"
+                onClick={handleLogout}
+                colorScheme="red"
+              >
+                Log Out
+              </Button>
+            ) : (
+              <>
+                <Button
+                  as={RouterLink}
+                  to="/login"
+                  variant="outline"
+                  size="md"
+                >
+                  Log In
+                </Button>
+                <Button
+                  as={RouterLink}
+                  to="/signup"
+                  variant="solid"
+                  size="md"
+                  bgGradient="linear(to-r, primary.400, accent.400)"
+                  _hover={{
+                    bgGradient: "linear(to-r, primary.500, accent.500)",
+                  }}
+                >
+                  Sign Up Free
+                </Button>
+              </>
+            )}
           </Stack>
 
           <IconButton
@@ -130,9 +168,44 @@ const Navbar = () => {
               <ChakraLink as={RouterLink} to="/#themes" py={2} fontWeight="500">Themes</ChakraLink>
               <ChakraLink as={RouterLink} to="/#analytics" py={2} fontWeight="500">Analytics</ChakraLink>
               <ChakraLink as={RouterLink} to="/#pricing" py={2} fontWeight="500">Pricing</ChakraLink>
-              <ChakraLink as={RouterLink} to="/builder" py={2} fontWeight="500" color="primary.400">Portfolio Builder</ChakraLink>
-              <Button variant="outline" w="full" my={2}>Log In</Button>
-              <Button variant="solid" w="full">Sign Up Free</Button>
+              {isLoggedIn && (
+                <ChakraLink as={RouterLink} to="/builder" py={2} fontWeight="500" color="primary.400">Portfolio Builder</ChakraLink>
+              )}
+              {isLoggedIn ? (
+                <Button
+                  variant="outline"
+                  w="full"
+                  my={2}
+                  onClick={handleLogout}
+                  colorScheme="red"
+                >
+                  Log Out
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    as={RouterLink}
+                    to="/login"
+                    variant="outline"
+                    w="full"
+                    my={2}
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    as={RouterLink}
+                    to="/signup"
+                    variant="solid"
+                    w="full"
+                    bgGradient="linear(to-r, primary.400, accent.400)"
+                    _hover={{
+                      bgGradient: "linear(to-r, primary.500, accent.500)",
+                    }}
+                  >
+                    Sign Up Free
+                  </Button>
+                </>
+              )}
             </Stack>
           </Box>
         )}

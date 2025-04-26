@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import { LoginDto } from './dto';
+import { UserDocument } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -44,10 +46,18 @@ export class AuthService {
         };
     }
 
-    async login(user: any, res: Response) {
+    async login(loginDto: LoginDto, res: Response) {
+        const user: UserDocument = await this.validateUser(
+            loginDto.email,
+            loginDto.password,
+        );
+
+        if (!user) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
         const tokens = await this.generateTokens(user);
         this.setTokenCookies(res, tokens);
-        return { message: 'Login successful' };
+        return { ...tokens, user };
     }
 
     async refreshTokens(refreshToken: string, res: Response) {

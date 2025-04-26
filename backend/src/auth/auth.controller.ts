@@ -12,16 +12,7 @@ export class AuthController {
         @Response({ passthrough: true }) res: ExpressResponse,
         @Body() loginDto: LoginDto,
     ) {
-        const user = await this.authService.validateUser(
-            loginDto.email,
-            loginDto.password,
-        );
-
-        if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
-        }
-
-        return this.authService.login(user, res);
+        return this.authService.login(loginDto, res);
     }
 
     @Post('refresh')

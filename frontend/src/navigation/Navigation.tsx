@@ -5,7 +5,7 @@ import LandingPage from "../pages/LandingPage"
 import PortfolioBuilder from "../pages/PortfolioBuilder"
 import CaseStudyDetail from "../pages/CaseStudyDetail"
 import PortfolioPreview from "../pages/PortfolioPreview"
-import Login from "../pages/Login"
+import Login from "../pages/login/Login"
 import Signup from "../pages/Signup"
 import AnalyticsDashboard from "../pages/AnalyticsDashboard"
 
