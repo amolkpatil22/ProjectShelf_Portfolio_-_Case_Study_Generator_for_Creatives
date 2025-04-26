@@ -42,6 +42,7 @@ export function useColorModeValue<T>(light: T, dark: T) {
 
 export function ColorModeIcon() {
   const { colorMode } = useColorMode()
+  // eslint-disable-next-line
   return colorMode === "dark" ? <LuMoon /> : <LuSun />
 }
 
