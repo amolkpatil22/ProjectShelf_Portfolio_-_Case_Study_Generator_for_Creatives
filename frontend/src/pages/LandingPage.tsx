@@ -35,7 +35,6 @@ const LandingPage = () => {
       <Analytics />
       <Testimonials />
       <CallToAction />
-      <Footer />
     </Box>
   );
 };

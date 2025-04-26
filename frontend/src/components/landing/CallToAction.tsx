@@ -17,7 +17,7 @@ const MotionBox = motion(Box);
 
 const CallToAction = () => {
   return (
-    <Box bg="gray.50">
+    <Box id="pricing" bg="gray.50">
       <Container maxW="container.xl" py={{ base: 16, md: 20 }}>
         <MotionBox
           initial={{ opacity: 0, y: 20 }}

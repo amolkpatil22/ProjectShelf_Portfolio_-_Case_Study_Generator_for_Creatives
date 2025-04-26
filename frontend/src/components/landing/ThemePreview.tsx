@@ -23,22 +23,25 @@ const themes = [
     id: 'minimal',
     name: 'Minimal',
     description: 'Clean, simple, and elegant design',
-    image: 'https://images.pexels.com/photos/5939401/pexels-photo-5939401.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
     color: '#3358FF',
+    bgGradient: 'linear(to-r, primary.400, primary.600)',
   },
   {
     id: 'bold',
     name: 'Bold',
     description: 'Strong visuals with high contrast',
-    image: 'https://images.pexels.com/photos/5483071/pexels-photo-5483071.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop',
     color: '#9061F9',
+    bgGradient: 'linear(to-r, accent.400, accent.600)',
   },
   {
     id: 'creative',
     name: 'Creative',
     description: 'Artistic layout with unique elements',
-    image: 'https://images.pexels.com/photos/5473955/pexels-photo-5473955.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+    image: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974&auto=format&fit=crop',
     color: '#10B981',
+    bgGradient: 'linear(to-r, secondary.400, secondary.600)',
   },
 ];
 
@@ -179,7 +182,7 @@ const ThemePreview = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                <Button 
+                <Button
                   size="lg"
                   colorScheme={selectedTheme === 'minimal' ? 'primary' : selectedTheme === 'bold' ? 'accent' : 'secondary'}
                   bg={selectedTheme === 'minimal' ? 'primary.400' : selectedTheme === 'bold' ? 'accent.400' : 'secondary.500'}
@@ -200,6 +203,17 @@ const ThemePreview = () => {
                 overflow="hidden"
                 boxShadow="2xl"
                 position="relative"
+                _before={{
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  bg: themes.find(t => t.id === selectedTheme)?.bgGradient,
+                  opacity: 0.1,
+                  zIndex: 1,
+                }}
               >
                 <Image
                   src={themes.find(t => t.id === selectedTheme)?.image}
@@ -208,7 +222,22 @@ const ThemePreview = () => {
                   h="auto"
                   objectFit="cover"
                   transition="all 0.5s ease"
+                  filter="contrast(1.1) brightness(1.1)"
                 />
+                <Box
+                  position="absolute"
+                  bottom={0}
+                  left={0}
+                  right={0}
+                  p={6}
+                  bg="rgba(0,0,0,0.7)"
+                  backdropFilter="blur(10px)"
+                  zIndex={2}
+                >
+                  <Text color="white" fontSize="lg" fontWeight="medium">
+                    {themes.find(t => t.id === selectedTheme)?.name} Theme Preview
+                  </Text>
+                </Box>
               </Box>
             </MotionBox>
           </SimpleGrid>

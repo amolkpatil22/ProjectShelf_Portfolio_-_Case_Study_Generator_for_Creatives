@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Button,
@@ -16,10 +15,10 @@ const MotionBox = motion(Box);
 
 const Hero = () => {
   const headingSize = useBreakpointValue({ base: '2xl', md: '3xl', lg: '4xl' });
-  
+
   return (
-    <Box 
-      position="relative" 
+    <Box
+      position="relative"
       overflow="hidden"
       bg="white"
       pt={{ base: 6, md: 8, lg: 20 }}
@@ -54,7 +53,7 @@ const Hero = () => {
         animate={{ scale: 1, rotate: -5 }}
         transition={{ duration: 12, repeat: Infinity, repeatType: "reverse" }}
       />
-      
+
       <Container maxW="container.xl" position="relative" zIndex="1">
         <Stack
           direction={{ base: 'column', lg: 'row' }}
@@ -75,7 +74,7 @@ const Hero = () => {
                 letterSpacing="wider"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: "0.5" }}
               >
                 Portfolio Generator for Creatives
               </Text>
@@ -87,7 +86,7 @@ const Hero = () => {
                 lineHeight="1.1"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
+                transition={{ duration: "0.5", delay: "0.1" }}
               >
                 Showcase Your Creative Work{' '}
                 <Text as="span" bgGradient="linear(to-r, primary.400, accent.400)" bgClip="text">
@@ -101,7 +100,7 @@ const Hero = () => {
               color="gray.600"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: "0.5", delay: "0.2" }}
             >
               Build stunning portfolios and detailed case studies that highlight your design process, development work, or writing projects. Stand out with custom themes and analytics.
             </Text>
@@ -112,45 +111,45 @@ const Hero = () => {
               justify={{ base: 'center', lg: 'flex-start' }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: "0.5", delay: "0.3" }}
             >
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 colorScheme="primary"
                 px={8}
               >
                 Get Started Free
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 px={8}
               >
                 View Examples
               </Button>
             </Stack>
-            <Flex 
-              align="center" 
+            <Flex
+              align="center"
               justify={{ base: 'center', lg: 'flex-start' }}
               mt={4}
               as={motion.div}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={{ duration: "0.5", delay: "0.4" }}
             >
               <Text fontSize="sm" fontWeight="medium" color="gray.500">
                 Trusted by designers, developers and writers at companies like
               </Text>
             </Flex>
-            <Flex 
-              wrap="wrap" 
-              justify={{ base: 'center', lg: 'flex-start' }} 
+            <Flex
+              wrap="wrap"
+              justify={{ base: 'center', lg: 'flex-start' }}
               gap={6}
               opacity={0.7}
               as={motion.div}
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              transition={{ duration: "0.5", delay: "0.5" }}
             >
               {['Adobe', 'Figma', 'Webflow', 'AWS', 'Dribbble'].map((company) => (
                 <Text key={company} fontWeight="bold" color="gray.500" fontSize="lg">
@@ -168,7 +167,7 @@ const Hero = () => {
             as={motion.div}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: "0.6", delay: "0.3" }}
           >
             <Box
               position="relative"
