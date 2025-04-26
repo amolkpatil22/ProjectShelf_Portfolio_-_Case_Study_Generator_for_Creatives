@@ -1,0 +1,1 @@
+# ProjectShelf_Portfolio_-_Case_Study_Generator_for_Creatives
