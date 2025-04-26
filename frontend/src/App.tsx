@@ -1,13 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { Provider } from './components/ui/provider';
+
 import { Button } from '@chakra-ui/react';
+import { Provider } from './components/ui/provider';
+import Navigation from './navigation/Navigation';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (
     <Provider>
-
+      <BrowserRouter>
+        <Navigation />
+      </BrowserRouter>
     </Provider>
   );
 }
