@@ -39,6 +39,16 @@ export interface PortfolioRequest {
     description: string;
     theme: string;
     isPublic: boolean;
+    name?: string;
+    bio?: string;
+    profileImage?: string;
+    email?: string;
+    linkedin?: string;
+    github?: string;
+    website?: string;
+    twitter?: string;
+    themeSettings?: ThemeSettings;
+    caseStudies?: CaseStudyResponse[];
 }
 
 export interface PortfolioResponse extends PortfolioRequest {

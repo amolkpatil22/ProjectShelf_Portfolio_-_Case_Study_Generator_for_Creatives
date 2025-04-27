@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Container,
@@ -16,38 +16,39 @@ import {
   Avatar,
   Icon,
   useColorModeValue,
+  Spinner,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail, ExternalLink, ChevronRight } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import { setPortfolio, setLoading, setError } from '../redux/features/portfolioSlice';
+import { getPortfolioById } from './portfolio-builder/action/portfolioBuilderAction';
+import { Portfolio } from './portfolio-builder/types/portfolioBuilderTypes';
 
 const MotionBox = motion(Box);
 
-interface PreviewProps {
-  theme: 'minimal' | 'creative' | 'bold';
-  data: {
-    name: string;
-    title: string;
-    bio: string;
-    avatar: string;
-    caseStudies: Array<{
-      id: string;
-      title: string;
-      description: string;
-      image: string;
-      category: string;
-      tools: string[];
-    }>;
-    contact: {
-      email: string;
-      linkedin: string;
-      github: string;
-      website: string;
-    };
-  };
+// Fallback images
+const FALLBACK_PROFILE_IMAGE = 'https://ui-avatars.com/api/?background=random';
+const FALLBACK_CASE_STUDY_IMAGE = 'https://source.unsplash.com/random/800x600/?design,technology';
+
+const getImageUrl = (imageUrl: string | undefined, type: 'profile' | 'case-study' = 'case-study') => {
+  if (!imageUrl) {
+    return type === 'profile' ? FALLBACK_PROFILE_IMAGE : FALLBACK_CASE_STUDY_IMAGE;
+  }
+  return imageUrl;
+};
+
+interface ThemeProps {
+  portfolio: Portfolio;
 }
 
-const MinimalTheme = ({ data }: PreviewProps) => {
+const MinimalTheme = ({ portfolio }: ThemeProps) => {
   const navigate = useNavigate();
 
   return (
@@ -56,16 +57,16 @@ const MinimalTheme = ({ data }: PreviewProps) => {
         <VStack spacing={20} align="stretch" className="theme-content">
           {/* Hero Section */}
           <VStack spacing={6} align="center" textAlign="center">
-            <Avatar size="2xl" src={data.avatar} />
+            <Avatar size="2xl" src={getImageUrl(portfolio.profileImage, 'profile')} />
             <VStack spacing={3}>
-              <Heading size="2xl">{data.name}</Heading>
-              <Text fontSize="xl" color="gray.600">{data.title}</Text>
+              <Heading size="2xl">{portfolio.name}</Heading>
+              <Text fontSize="xl" color="gray.600">{portfolio.title}</Text>
             </VStack>
-            <Text maxW="2xl" color="gray.600">{data.bio}</Text>
+            <Text maxW="2xl" color="gray.600">{portfolio.bio}</Text>
             <HStack spacing={4}>
-              <Link href={data.contact.github}><Icon as={Github} boxSize={6} /></Link>
-              <Link href={data.contact.linkedin}><Icon as={Linkedin} boxSize={6} /></Link>
-              <Link href={`mailto:${data.contact.email}`}><Icon as={Mail} boxSize={6} /></Link>
+              <Link href={portfolio.github}><Icon as={Github} boxSize={6} /></Link>
+              <Link href={portfolio.linkedin}><Icon as={Linkedin} boxSize={6} /></Link>
+              <Link href={`mailto:${portfolio.email}`}><Icon as={Mail} boxSize={6} /></Link>
             </HStack>
           </VStack>
 
@@ -73,7 +74,7 @@ const MinimalTheme = ({ data }: PreviewProps) => {
           <VStack spacing={12}>
             <Heading size="xl">Selected Work</Heading>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
-              {data.caseStudies.map((study) => (
+              {portfolio.caseStudies.map((study) => (
                 <Box
                   key={study.id}
                   borderWidth="1px"
@@ -82,20 +83,25 @@ const MinimalTheme = ({ data }: PreviewProps) => {
                   _hover={{ transform: 'translateY(-4px)', shadow: 'lg' }}
                   transition="all 0.3s"
                   cursor="pointer"
-                  onClick={() => navigate(`/case-study/${study.id}?theme=minimal`)}
+                  onClick={() => navigate(`/case-study/${study.id}`)}
                 >
-                  <Image
-                    src={study.image}
-                    alt={study.title}
-                    h="200px"
-                    w="full"
-                    objectFit="cover"
-                  />
+                  <Box position="relative" width="100%" paddingTop="56.25%"> {/* 16:9 Aspect Ratio */}
+                    <Image
+                      src={getImageUrl(study.image)}
+                      alt={study.title}
+                      position="absolute"
+                      top="0"
+                      left="0"
+                      width="100%"
+                      height="100%"
+                      objectFit="cover"
+                    />
+                  </Box>
                   <Box p={6}>
-                    <Badge mb={2}>{study.category}</Badge>
+                    <Badge colorScheme="blue" mb={2}>{study.category}</Badge>
                     <Heading size="md" mb={2}>{study.title}</Heading>
                     <Text color="gray.600" noOfLines={2}>{study.description}</Text>
-                    <HStack mt={4} spacing={2}>
+                    <HStack mt={4} spacing={2} flexWrap="wrap">
                       {study.tools.map((tool) => (
                         <Badge key={tool} colorScheme="gray">{tool}</Badge>
                       ))}
@@ -103,12 +109,10 @@ const MinimalTheme = ({ data }: PreviewProps) => {
                     <Button
                       rightIcon={<ChevronRight />}
                       variant="ghost"
-                      size="sm"
                       mt={4}
-                      w="full"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/case-study/${study.id}?theme=minimal`);
+                        navigate(`/case-study/${study.id}`);
                       }}
                     >
                       View Case Study
@@ -124,7 +128,7 @@ const MinimalTheme = ({ data }: PreviewProps) => {
   );
 };
 
-const CreativeTheme = ({ data }: PreviewProps) => {
+const CreativeTheme = ({ portfolio }: ThemeProps) => {
   const navigate = useNavigate();
 
   return (
@@ -143,15 +147,20 @@ const CreativeTheme = ({ data }: PreviewProps) => {
               zIndex={0}
               borderRadius="2xl"
             />
-            <Image
-              src={data.avatar}
-              alt={data.name}
-              borderRadius="2xl"
-              position="relative"
-              zIndex={1}
-              objectFit="cover"
-              h="full"
-            />
+            <Box position="relative" width="100%" paddingTop="100%"> {/* 1:1 Aspect Ratio */}
+              <Image
+                src={getImageUrl(portfolio.profileImage, 'profile')}
+                alt={portfolio.name}
+                borderRadius="2xl"
+                position="absolute"
+                top="0"
+                left="0"
+                width="100%"
+                height="100%"
+                objectFit="cover"
+                zIndex={1}
+              />
+            </Box>
           </Box>
           <VStack align="start" spacing={6} justify="center">
             <Heading
@@ -159,12 +168,12 @@ const CreativeTheme = ({ data }: PreviewProps) => {
               bgGradient="linear(to-r, primary.400, accent.400)"
               bgClip="text"
             >
-              {data.name}
+              {portfolio.name}
             </Heading>
             <Text fontSize="2xl" fontWeight="bold" color="gray.700">
-              {data.title}
+              {portfolio.title}
             </Text>
-            <Text fontSize="lg" color="gray.600">{data.bio}</Text>
+            <Text fontSize="lg" color="gray.600">{portfolio.bio}</Text>
             <HStack spacing={4}>
               <Button leftIcon={<Github />} variant="outline">GitHub</Button>
               <Button leftIcon={<Linkedin />} variant="outline">LinkedIn</Button>
@@ -175,7 +184,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
 
         {/* Case Studies */}
         <VStack spacing={16} className="theme-content">
-          {data.caseStudies.map((study, index) => (
+          {portfolio.caseStudies.map((study, index) => (
             <Flex
               key={study.id}
               direction={{ base: 'column', lg: index % 2 === 0 ? 'row' : 'row-reverse' }}
@@ -185,7 +194,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
               <Box
                 position="relative"
                 cursor="pointer"
-                onClick={() => navigate(`/case-study/${study.id}?theme=creative`)}
+                onClick={() => navigate(`/case-study/${study.id}`)}
                 flex="1"
                 _before={{
                   content: '""',
@@ -199,12 +208,19 @@ const CreativeTheme = ({ data }: PreviewProps) => {
                   borderRadius: 'xl',
                 }}
               >
-                <Image
-                  src={study.image}
-                  alt={study.title}
-                  borderRadius="xl"
-                  objectFit="cover"
-                />
+                <Box position="relative" width="100%" paddingTop="75%"> {/* 4:3 Aspect Ratio */}
+                  <Image
+                    src={getImageUrl(study.image)}
+                    alt={study.title}
+                    borderRadius="xl"
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    width="100%"
+                    height="100%"
+                    objectFit="cover"
+                  />
+                </Box>
               </Box>
               <VStack align="start" spacing={6} flex="1">
                 <Badge
@@ -228,7 +244,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
                   rightIcon={<ChevronRight />}
                   variant="ghost"
                   colorScheme={index % 2 === 0 ? 'primary' : 'accent'}
-                  onClick={() => navigate(`/case-study/${study.id}?theme=creative`)}
+                  onClick={() => navigate(`/case-study/${study.id}`)}
                 >
                   View Case Study
                 </Button>
@@ -241,7 +257,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
   );
 };
 
-const BoldTheme = ({ data }: PreviewProps) => {
+const BoldTheme = ({ portfolio }: ThemeProps) => {
   const navigate = useNavigate();
 
   return (
@@ -268,20 +284,16 @@ const BoldTheme = ({ data }: PreviewProps) => {
                 bgGradient="linear(to-r, primary.400, accent.400)"
                 bgClip="text"
               >
-                {data.name}
+                {portfolio.name}
               </Heading>
-              <Heading size="2xl" color="gray.300">{data.title}</Heading>
+              <Heading size="2xl" color="gray.300">{portfolio.title}</Heading>
               <Text fontSize="xl" color="gray.400" maxW="2xl">
-                {data.bio}
+                {portfolio.bio}
               </Text>
               <HStack spacing={6}>
-                <Link href={data.contact.github}>
-                  <Icon as={Github} boxSize={8} color="white" />
-                </Link>
-                <Link href={data.contact.linkedin}>
-                  <Icon as={Linkedin} boxSize={8} color="white" />
-                </Link>
-                <Link href={`mailto:${data.contact.email}`}>
+                <Link href={portfolio.github}><Icon as={Github} boxSize={8} color="white" /></Link>
+                <Link href={portfolio.linkedin}><Icon as={Linkedin} boxSize={8} color="white" /></Link>
+                <Link href={`mailto:${portfolio.email}`}>
                   <Icon as={Mail} boxSize={8} color="white" />
                 </Link>
               </HStack>
@@ -300,12 +312,19 @@ const BoldTheme = ({ data }: PreviewProps) => {
                 opacity: 0.3,
               }}
             >
-              <Image
-                src={data.avatar}
-                alt={data.name}
-                borderRadius="2xl"
-                position="relative"
-              />
+              <Box position="relative" width="100%" paddingTop="100%"> {/* 1:1 Aspect Ratio */}
+                <Image
+                  src={getImageUrl(portfolio.profileImage, 'profile')}
+                  alt={portfolio.name}
+                  borderRadius="2xl"
+                  position="absolute"
+                  top="0"
+                  left="0"
+                  width="100%"
+                  height="100%"
+                  objectFit="cover"
+                />
+              </Box>
             </Box>
           </Grid>
         </Box>
@@ -314,7 +333,7 @@ const BoldTheme = ({ data }: PreviewProps) => {
         <VStack spacing={20} className="theme-content">
           <Heading size="2xl" textAlign="center">Featured Work</Heading>
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={12}>
-            {data.caseStudies.map((study) => (
+            {portfolio.caseStudies.map((study) => (
               <Box
                 key={study.id}
                 bg="gray.900"
@@ -329,14 +348,19 @@ const BoldTheme = ({ data }: PreviewProps) => {
                 }}
                 transition="all 0.3s"
               >
-                <Image
-                  src={study.image}
-                  alt={study.title}
-                  h="300px"
-                  w="full"
-                  objectFit="cover"
-                  transition="all 0.3s"
-                />
+                <Box position="relative" width="100%" paddingTop="56.25%"> {/* 16:9 Aspect Ratio */}
+                  <Image
+                    src={getImageUrl(study.image)}
+                    alt={study.title}
+                    position="absolute"
+                    top="0"
+                    left="0"
+                    width="100%"
+                    height="100%"
+                    objectFit="cover"
+                    transition="all 0.3s"
+                  />
+                </Box>
                 <Box
                   position="absolute"
                   bottom={0}
@@ -392,13 +416,45 @@ const BoldTheme = ({ data }: PreviewProps) => {
 };
 
 const PortfolioPreview = () => {
+  const { portfolioId } = useParams<{ portfolioId: string }>();
   const [searchParams] = useSearchParams();
   const theme = (searchParams.get('theme') || 'minimal') as 'minimal' | 'creative' | 'bold';
   const primaryColor = searchParams.get('color') || '#3358FF';
   const fontFamily = searchParams.get('font') || 'Inter';
 
+  const dispatch = useDispatch();
+  const portfolio = useSelector((state: RootState) => state.portfolio.currentPortfolio);
+  const isLoading = useSelector((state: RootState) => state.portfolio.loading);
+  const error = useSelector((state: RootState) => state.portfolio.error);
+
+  // Fetch portfolio data
+  useEffect(() => {
+    const fetchPortfolioData = async () => {
+      if (!portfolioId) {
+        dispatch(setError('Portfolio ID is required'));
+        return;
+      }
+
+      try {
+        dispatch(setLoading(true));
+        const response = await getPortfolioById(portfolioId);
+        if (response.success && response.data) {
+          dispatch(setPortfolio(response.data));
+        } else {
+          dispatch(setError(response.errors?.[0] || 'Failed to fetch portfolio'));
+        }
+      } catch (err) {
+        dispatch(setError(err instanceof Error ? err.message : 'Failed to fetch portfolio'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchPortfolioData();
+  }, [portfolioId, dispatch]);
+
   // Apply custom theme settings
-  React.useEffect(() => {
+  useEffect(() => {
     // Create a style element to inject custom CSS
     const styleElement = document.createElement('style');
     styleElement.textContent = `
@@ -436,52 +492,33 @@ const PortfolioPreview = () => {
     };
   }, [primaryColor, fontFamily]);
 
-  const sampleData = {
-    name: "Sarah Anderson",
-    title: "Product Designer & Developer",
-    bio: "I'm a multidisciplinary designer and developer with over 8 years of experience creating digital products that solve real problems. I specialize in user interface design, brand identity, and front-end development.",
-    avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-    caseStudies: [
-      {
-        id: '1',
-        title: 'E-Commerce Website Redesign',
-        description: 'Complete redesign of an online retail platform focusing on user experience and conversion optimization.',
-        image: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg',
-        category: 'UX Design',
-        tools: ['Figma', 'React', 'Node.js'],
-      },
-      {
-        id: '2',
-        title: 'Mobile Banking App',
-        description: 'A secure and intuitive mobile banking application with advanced features and biometric authentication.',
-        image: 'https://images.pexels.com/photos/6804065/pexels-photo-6804065.jpeg',
-        category: 'Development',
-        tools: ['React Native', 'TypeScript', 'Firebase'],
-      },
-      {
-        id: '3',
-        title: 'Brand Identity System',
-        description: 'Comprehensive brand identity design for a technology startup, including logo, guidelines, and marketing materials.',
-        image: 'https://images.pexels.com/photos/6444/pencil-typography-black-design.jpg',
-        category: 'Branding',
-        tools: ['Illustrator', 'Photoshop', 'InDesign'],
-      },
-    ],
-    contact: {
-      email: "sarah@example.com",
-      linkedin: "https://linkedin.com/in/sarah",
-      github: "https://github.com/sarah",
-      website: "https://sarah.design"
-    }
-  };
+  if (isLoading) {
+    return (
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
+
+  if (error || !portfolio) {
+    return (
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Alert status="error" maxW="container.md">
+          <AlertIcon />
+          <AlertTitle>Error!</AlertTitle>
+          <AlertDescription>{error || 'Portfolio not found'}</AlertDescription>
+        </Alert>
+      </Box>
+    );
+  }
 
   switch (theme) {
     case 'creative':
-      return <CreativeTheme theme={theme} data={sampleData} />;
+      return <CreativeTheme portfolio={portfolio} />;
     case 'bold':
-      return <BoldTheme theme={theme} data={sampleData} />;
+      return <BoldTheme portfolio={portfolio} />;
     default:
-      return <MinimalTheme theme={theme} data={sampleData} />;
+      return <MinimalTheme portfolio={portfolio} />;
   }
 };
 

@@ -164,8 +164,23 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
     };
 
     const handlePreview = () => {
+        // Get portfolio ID from localStorage
+        const user = localStorage.getItem('user');
+        const portfolioId = JSON.parse(user || '{}').portfolioId;
+
+        if (!portfolioId) {
+            toast({
+                title: 'Error',
+                description: 'No portfolio ID found. Please save your portfolio first.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+
         window.open(
-            `/preview?theme=${portfolio.themeSettings.layout}&color=${encodeURIComponent(portfolio.themeSettings.primaryColor)}&font=${encodeURIComponent(portfolio.themeSettings.fontFamily)}`,
+            `/preview/${portfolioId}?theme=${portfolio.themeSettings.layout}&color=${encodeURIComponent(portfolio.themeSettings.primaryColor)}&font=${encodeURIComponent(portfolio.themeSettings.fontFamily)}`,
             '_blank'
         );
     };

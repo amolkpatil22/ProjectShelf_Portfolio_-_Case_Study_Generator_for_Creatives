@@ -5,8 +5,18 @@ import { RootState } from '../store';
 // Types
 interface Portfolio {
     id?: string;
+    _id?: string;
     title: string;
     description: string;
+    name: string;
+    bio: string;
+    profileImage: string;
+    email: string;
+    linkedin: string;
+    github: string;
+    website: string;
+    twitter: string;
+    userId: string;
     themeSettings: ThemeSettings;
     caseStudies: CaseStudy[];
 }
