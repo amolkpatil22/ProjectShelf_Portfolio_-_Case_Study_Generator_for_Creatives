@@ -30,7 +30,7 @@ export class PortfolioController {
         @Req() req: Request,
     ) {
         // Exclude _id and userId from being updated
-
+        
         return this.portfolioService.update(id, updatePortfolioDto, req.user);
     }
 

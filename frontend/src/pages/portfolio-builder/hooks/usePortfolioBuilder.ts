@@ -21,6 +21,21 @@ const DEFAULT_PORTFOLIO: Portfolio = {
     caseStudies: DEFAULT_CASE_STUDIES,
 };
 
+const DEFAULT_CASE_STUDY: CaseStudy = {
+    id: '',
+    title: '',
+    description: '',
+    image: '',
+    category: '',
+    tools: [],
+    challenge: '',
+    solution: '',
+    outcome: '',
+    images: [],
+    videoLinks: [],
+    timeline: []
+};
+
 export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
     const [portfolio, setPortfolio] = useState<Portfolio>(DEFAULT_PORTFOLIO);
     const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
@@ -78,13 +93,34 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
         setIsEditing(true);
     };
 
+    const handleAddCaseStudy = () => {
+        const newCaseStudy = {
+            ...DEFAULT_CASE_STUDY,
+            id: Date.now().toString(), // Temporary ID for new case study
+        };
+        setEditingCaseStudy(newCaseStudy);
+        setIsEditing(true);
+    };
+
     const handleUpdateCaseStudy = (updatedCaseStudy: CaseStudy) => {
-        setPortfolio(prev => ({
-            ...prev,
-            caseStudies: prev.caseStudies.map(cs =>
-                cs.id === updatedCaseStudy.id ? updatedCaseStudy : cs
-            )
-        }));
+        setPortfolio(prev => {
+            const existingIndex = prev.caseStudies.findIndex(cs => cs.id === updatedCaseStudy.id);
+            const updatedCaseStudies = [...prev.caseStudies];
+
+            if (existingIndex >= 0) {
+                // Update existing case study
+                updatedCaseStudies[existingIndex] = updatedCaseStudy;
+            } else {
+                // Add new case study
+                updatedCaseStudies.push(updatedCaseStudy);
+            }
+
+            return {
+                ...prev,
+                caseStudies: updatedCaseStudies
+            };
+        });
+
         setIsEditing(false);
         setEditingCaseStudy(null);
 
@@ -148,5 +184,6 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
         handleCancelEdit,
         handleSave,
         handlePreview,
+        handleAddCaseStudy,
     };
 }; 

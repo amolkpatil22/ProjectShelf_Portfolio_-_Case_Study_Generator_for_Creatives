@@ -55,6 +55,7 @@ const PortfolioBuilder = () => {
         handleCancelEdit,
         handleSave,
         handlePreview,
+        handleAddCaseStudy,
     } = usePortfolioBuilder();
     console.log(portfolio);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -163,7 +164,7 @@ const PortfolioBuilder = () => {
                                             caseStudies={portfolio.caseStudies}
                                             onEdit={handleEditCaseStudy}
                                             onDelete={() => { }}
-                                            onAdd={() => { }}
+                                            onAdd={handleAddCaseStudy}
                                         />
                                     )}
                                 </TabPanel>

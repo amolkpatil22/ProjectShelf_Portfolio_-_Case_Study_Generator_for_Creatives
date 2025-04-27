@@ -64,4 +64,5 @@ export interface UsePortfolioBuilderReturn {
     handleCancelEdit: () => void;
     handleSave: () => Promise<void>;
     handlePreview: () => void;
+    handleAddCaseStudy: () => void;
 } 

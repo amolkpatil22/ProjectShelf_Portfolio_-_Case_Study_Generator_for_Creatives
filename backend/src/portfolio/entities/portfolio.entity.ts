@@ -42,8 +42,41 @@ export class Portfolio {
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     userId: Types.ObjectId;
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: 'CaseStudy' }], default: [] })
-    caseStudies: Types.ObjectId[];
+    @Prop({
+        type: [
+            {
+                id: { type: String, required: true },
+                title: { type: String, required: true },
+                subtitle: { type: String },
+                description: { type: String },
+                category: { type: String },
+                challenge: { type: String },
+                solution: { type: String },
+                outcome: { type: String },
+                image: { type: String },
+                images: { type: [String], default: [] },
+                tools: { type: [String], default: [] },
+                timeline: { type: [String], default: [] },
+                videoLinks: { type: [String], default: [] },
+            },
+        ],
+        default: [],
+    })
+    caseStudies: Array<{
+        id: string;
+        title: string;
+        subtitle?: string;
+        description?: string;
+        category?: string;
+        challenge?: string;
+        solution?: string;
+        outcome?: string;
+        image?: string;
+        images?: string[];
+        tools?: string[];
+        timeline?: string[];
+        videoLinks?: string[];
+    }>;
 }
 
-export const PortfolioSchema = SchemaFactory.createForClass(Portfolio); 
+export const PortfolioSchema = SchemaFactory.createForClass(Portfolio);

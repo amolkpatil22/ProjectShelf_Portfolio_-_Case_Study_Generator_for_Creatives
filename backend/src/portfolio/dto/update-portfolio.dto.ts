@@ -47,9 +47,18 @@ export class UpdatePortfolioDto {
 
     @IsOptional()
     caseStudies?: Array<{
+        id: string;
         title: string;
+        subtitle: string;
         description: string;
-        imageUrl?: string;
-        link?: string;
+        category: string;
+        challenge: string;
+        solution: string;
+        outcome: string;
+        image: string;
+        images: string[];
+        tools: string[];
+        timeline: string[];
+        videoLinks: string[];
     }>;
 }
