@@ -5,11 +5,13 @@ import { User, UserDocument } from './entities/user.entity';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
 import { mapToUserResponse } from './mappers/user.mapper';
 import * as bcrypt from 'bcrypt';
+import { Portfolio, PortfolioDocument } from '../portfolio/entities/portfolio.entity';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
+        @InjectModel(Portfolio.name) private portfolioModel: Model<PortfolioDocument>,
     ) { }
 
     async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -30,6 +32,30 @@ export class UsersService {
         });
 
         const savedUser = await createdUser.save();
+
+        // Create empty portfolio for the user
+        const emptyPortfolio = new this.portfolioModel({
+            name: `${createUserDto.firstName} ${createUserDto.lastName}`,
+            title: `${createUserDto.firstName}'s Portfolio`,
+            bio: '',
+            profileImage: '',
+            email: createUserDto.email,
+            linkedin: '',
+            github: '',
+            website: '',
+            twitter: '',
+            themeSettings: {
+                primaryColor: '#3358FF',
+                fontFamily: 'Inter',
+                layout: 'minimal',
+            },
+            userId: savedUser._id,
+            caseStudies: [],
+        });
+
+        await emptyPortfolio.save();
+
+        // Return user response without portfolio ID
         const userResponse = mapToUserResponse(savedUser);
         if (!userResponse) {
             throw new Error('Failed to create user');
@@ -78,10 +104,19 @@ export class UsersService {
 
     async remove(id: string): Promise<UserResponseDto> {
         const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
+
+        // Also delete the user's portfolio
+        await this.portfolioModel.deleteMany({ userId: id }).exec();
+
         const userResponse = mapToUserResponse(deletedUser);
         if (!userResponse) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         return userResponse;
+    }
+
+    async getPortfolioId(userId: string): Promise<string | null> {
+        const portfolio = await this.portfolioModel.findOne({ userId }).exec();
+        return portfolio ? (portfolio as any)._id.toString() : null;
     }
 } 

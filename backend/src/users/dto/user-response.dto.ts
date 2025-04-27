@@ -5,6 +5,7 @@ export class UserResponseDto {
     email: string;
     isActive: boolean;
     role: string;
+    portfolioId?: string;
     createdAt: Date;
     updatedAt: Date;
 } 

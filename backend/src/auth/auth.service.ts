@@ -55,9 +55,20 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
         }
+
         const tokens = await this.generateTokens(user);
         this.setTokenCookies(res, tokens);
-        return { ...tokens, user };
+
+        // Get portfolio ID
+        const portfolioId = await this.usersService.getPortfolioId((user as any)._id.toString());
+
+        return {
+            ...tokens,
+            user: {
+                ...user,
+                portfolioId
+            }
+        };
     }
 
     async refreshTokens(refreshToken: string, res: Response) {
@@ -85,14 +96,14 @@ export class AuthService {
     }
 
     private setTokenCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
-        res.cookie('access_token', tokens.accessToken, {
+        res.cookie('accessToken', tokens.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000,
         });
 
-        res.cookie('refresh_token', tokens.refreshToken, {
+        res.cookie('refreshToken', tokens.refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
