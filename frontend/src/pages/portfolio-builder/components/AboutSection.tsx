@@ -78,11 +78,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                         placeholder="https://example.com/profile.jpg"
                         borderRadius="md"
                     />
-                    <InputRightElement width="4.5rem">
-                        <Button h="1.75rem" size="sm" variant="ghost">
-                            Upload
-                        </Button>
-                    </InputRightElement>
+
                 </InputGroup>
                 {profileImage && (
                     <Box mt={4} borderRadius="md" overflow="hidden" boxShadow="sm" maxW="200px">

@@ -1,13 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { ThemeSettings, CaseStudy, UsePortfolioBuilderReturn } from '../types/portfolioBuilderTypes';
+import { ThemeSettings, CaseStudy, UsePortfolioBuilderReturn, Portfolio } from '../types/portfolioBuilderTypes';
 import { DEFAULT_THEME_SETTINGS, DEFAULT_CASE_STUDIES } from '../constants/portfolioBuilderConstants';
 import { savePortfolio, getPortfolio, saveCaseStudy, getPortfolioFromLocalStorage } from '../action/portfolioBuilderAction';
 
+const DEFAULT_PORTFOLIO: Portfolio = {
+    _id: '',
+    name: '',
+    title: '',
+    bio: '',
+    profileImage: '',
+    email: '',
+    linkedin: '',
+    github: '',
+    website: '',
+    twitter: '',
+    themeSettings: DEFAULT_THEME_SETTINGS,
+    userId: '',
+    caseStudies: DEFAULT_CASE_STUDIES,
+};
+
 export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
-    const [themeSettings, setThemeSettings] = useState<ThemeSettings>(DEFAULT_THEME_SETTINGS);
-    const [caseStudies, setCaseStudies] = useState<CaseStudy[]>(DEFAULT_CASE_STUDIES);
+    const [portfolio, setPortfolio] = useState<Portfolio>(DEFAULT_PORTFOLIO);
     const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editingCaseStudy, setEditingCaseStudy] = useState<CaseStudy | null>(null);
@@ -27,14 +42,7 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
                 const response = await getPortfolioFromLocalStorage();
 
                 if (response.success && response.data) {
-                    // Update theme settings and case studies with fetched data
-                    if (response.data.themeSettings) {
-                        setThemeSettings(response.data.themeSettings);
-                    }
-
-                    if (response.data.caseStudies && response.data.caseStudies.length > 0) {
-                        setCaseStudies(response.data.caseStudies);
-                    }
+                    setPortfolio(response.data);
                 } else {
                     setError(response.errors?.[0] || 'Failed to fetch portfolio data');
                 }
@@ -48,10 +56,20 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
         fetchPortfolioData();
     }, []);
 
-    const updateTheme = (key: keyof ThemeSettings, value: string) => {
-        setThemeSettings(prev => ({
+    const updatePortfolio = (field: keyof Portfolio, value: any) => {
+        setPortfolio(prev => ({
             ...prev,
-            [key]: value,
+            [field]: value,
+        }));
+    };
+
+    const updateTheme = (key: keyof ThemeSettings, value: string) => {
+        setPortfolio(prev => ({
+            ...prev,
+            themeSettings: {
+                ...prev.themeSettings,
+                [key]: value,
+            }
         }));
     };
 
@@ -61,9 +79,12 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
     };
 
     const handleUpdateCaseStudy = (updatedCaseStudy: CaseStudy) => {
-        setCaseStudies(prev =>
-            prev.map(cs => cs.id === updatedCaseStudy.id ? updatedCaseStudy : cs)
-        );
+        setPortfolio(prev => ({
+            ...prev,
+            caseStudies: prev.caseStudies.map(cs =>
+                cs.id === updatedCaseStudy.id ? updatedCaseStudy : cs
+            )
+        }));
         setIsEditing(false);
         setEditingCaseStudy(null);
 
@@ -82,10 +103,7 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
 
     const handleSave = async () => {
         try {
-            const response = await savePortfolio({
-                themeSettings,
-                caseStudies
-            });
+            const response = await savePortfolio(portfolio);
 
             if (response.success) {
                 toast({
@@ -111,19 +129,19 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
 
     const handlePreview = () => {
         window.open(
-            `/preview?theme=${themeSettings.layout}&color=${encodeURIComponent(themeSettings.primaryColor)}&font=${encodeURIComponent(themeSettings.fontFamily)}`,
+            `/preview?theme=${portfolio.themeSettings.layout}&color=${encodeURIComponent(portfolio.themeSettings.primaryColor)}&font=${encodeURIComponent(portfolio.themeSettings.fontFamily)}`,
             '_blank'
         );
     };
 
     return {
-        themeSettings,
-        caseStudies,
+        portfolio,
         selectedCaseStudy,
         isEditing,
         editingCaseStudy,
         isLoading,
         error,
+        updatePortfolio,
         updateTheme,
         handleEditCaseStudy,
         handleUpdateCaseStudy,

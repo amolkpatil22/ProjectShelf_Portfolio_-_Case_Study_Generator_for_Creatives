@@ -39,15 +39,16 @@ import { CaseStudyList } from './components/CaseStudyList';
 import { PortfolioSettings } from './components/PortfolioSettings';
 import { AboutSection } from './components/AboutSection';
 import { ContactSection } from './components/ContactSection';
+import { Portfolio } from './types/portfolioBuilderTypes';
 
 const PortfolioBuilder = () => {
     const {
-        themeSettings,
-        caseStudies,
+        portfolio,
         isEditing,
         editingCaseStudy,
         isLoading,
         error,
+        updatePortfolio,
         updateTheme,
         handleEditCaseStudy,
         handleUpdateCaseStudy,
@@ -55,7 +56,7 @@ const PortfolioBuilder = () => {
         handleSave,
         handlePreview,
     } = usePortfolioBuilder();
-
+    console.log(portfolio);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isPreviewOpen, onOpen: onPreviewOpen, onClose: onPreviewClose } = useModalDisclosure();
     const toast = useToast();
@@ -102,7 +103,7 @@ const PortfolioBuilder = () => {
                         display={{ base: 'none', md: 'block' }}
                     >
                         <PortfolioSettings
-                            themeSettings={themeSettings}
+                            themeSettings={portfolio.themeSettings}
                             onUpdateTheme={updateTheme}
                         />
                     </Box>
@@ -141,11 +142,11 @@ const PortfolioBuilder = () => {
                             <TabPanels>
                                 <TabPanel>
                                     <AboutSection
-                                        name={themeSettings.name || ''}
-                                        title={themeSettings.title || ''}
-                                        bio={themeSettings.bio || ''}
-                                        profileImage={themeSettings.profileImage || ''}
-                                        onUpdate={(field, value) => updateTheme(field, value)}
+                                        name={portfolio.name || ''}
+                                        title={portfolio.title || ''}
+                                        bio={portfolio.bio || ''}
+                                        profileImage={portfolio.profileImage || ''}
+                                        onUpdate={(field, value) => updatePortfolio(field as keyof Portfolio, value)}
                                     />
                                 </TabPanel>
 
@@ -159,7 +160,7 @@ const PortfolioBuilder = () => {
                                         />
                                     ) : (
                                         <CaseStudyList
-                                            caseStudies={caseStudies}
+                                            caseStudies={portfolio.caseStudies}
                                             onEdit={handleEditCaseStudy}
                                             onDelete={() => { }}
                                             onAdd={() => { }}
@@ -169,12 +170,12 @@ const PortfolioBuilder = () => {
 
                                 <TabPanel>
                                     <ContactSection
-                                        email={themeSettings.email || ''}
-                                        linkedin={themeSettings.linkedin || ''}
-                                        github={themeSettings.github || ''}
-                                        website={themeSettings.website || ''}
-                                        twitter={themeSettings.twitter || ''}
-                                        onUpdate={(field, value) => updateTheme(field, value)}
+                                        email={portfolio.email || ''}
+                                        linkedin={portfolio.linkedin || ''}
+                                        github={portfolio.github || ''}
+                                        website={portfolio.website || ''}
+                                        twitter={portfolio.twitter || ''}
+                                        onUpdate={(field, value) => updatePortfolio(field as keyof Portfolio, value)}
                                     />
                                 </TabPanel>
                             </TabPanels>
@@ -191,7 +192,7 @@ const PortfolioBuilder = () => {
                     <DrawerHeader>Theme Settings</DrawerHeader>
                     <DrawerBody>
                         <PortfolioSettings
-                            themeSettings={themeSettings}
+                            themeSettings={portfolio.themeSettings}
                             onUpdateTheme={updateTheme}
                         />
                     </DrawerBody>
@@ -219,7 +220,7 @@ const PortfolioBuilder = () => {
                         <ModalBody p={0}>
                             <Box
                                 as="iframe"
-                                src={`/preview?theme=${themeSettings.layout}`}
+                                src={`/preview?theme=${portfolio.themeSettings.layout}`}
                                 width="100%"
                                 height="80vh"
                                 border="none"

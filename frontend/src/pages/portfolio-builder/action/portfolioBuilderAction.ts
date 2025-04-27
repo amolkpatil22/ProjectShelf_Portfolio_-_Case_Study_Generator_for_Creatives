@@ -37,7 +37,7 @@ export const getPortfolioById = async (portfolioId: string): Promise<ApiResponse
         const response = await portfolioApi.get(portfolioId);
         return {
             success: true,
-            data: response.data
+            data: response
         };
     } catch (error: any) {
         return {

@@ -2,6 +2,31 @@ export interface ThemeSettings {
     primaryColor: string;
     fontFamily: string;
     layout: string;
+}
+
+export interface TimelineEntry {
+    date: string;
+    title: string;
+    description: string;
+}
+
+export interface CaseStudy {
+    id: string;
+    title: string;
+    description: string;
+    image: string;
+    category: string;
+    tools: string[];
+    challenge: string;
+    solution: string;
+    outcome: string;
+    images: string[];
+    videoLinks: string[];
+    timeline: TimelineEntry[];
+}
+
+export interface Portfolio {
+    _id?: string;
     name: string;
     title: string;
     bio: string;
@@ -11,36 +36,13 @@ export interface ThemeSettings {
     github: string;
     website: string;
     twitter: string;
-}
-
-export interface TimelineEvent {
-    date: string;
-    title: string;
-    description: string;
-}
-
-export interface CaseStudy {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    challenge: string;
-    solution: string;
-    results: string;
-    technologies: string[];
-    images: string[];
-    videos: string[];
-    role: string;
-    duration: string;
-    teamSize: string;
-    createdAt: string;
-    updatedAt: string;
+    userId: string;
+    themeSettings: ThemeSettings;
+    caseStudies: CaseStudy[];
 }
 
 export interface PortfolioBuilderState {
-    themeSettings: ThemeSettings;
-    caseStudies: CaseStudy[];
-    currentCaseStudy: CaseStudy | null;
+    portfolio: Portfolio;
     isLoading: boolean;
     error: string | null;
     selectedCaseStudy: CaseStudy | null;
@@ -49,13 +51,13 @@ export interface PortfolioBuilderState {
 }
 
 export interface UsePortfolioBuilderReturn {
-    themeSettings: ThemeSettings;
-    caseStudies: CaseStudy[];
+    portfolio: Portfolio;
     selectedCaseStudy: CaseStudy | null;
     isEditing: boolean;
     editingCaseStudy: CaseStudy | null;
     isLoading: boolean;
     error: string | null;
+    updatePortfolio: (field: keyof Portfolio, value: any) => void;
     updateTheme: (key: keyof ThemeSettings, value: string) => void;
     handleEditCaseStudy: (caseStudy: CaseStudy) => void;
     handleUpdateCaseStudy: (updatedCaseStudy: CaseStudy) => void;
