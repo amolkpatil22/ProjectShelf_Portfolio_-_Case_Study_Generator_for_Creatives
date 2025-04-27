@@ -4,6 +4,15 @@ export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     primaryColor: '#3358FF',
     fontFamily: 'Inter',
     layout: 'minimal',
+    name: '',
+    title: '',
+    bio: '',
+    profileImage: '',
+    email: '',
+    linkedin: '',
+    github: '',
+    website: '',
+    twitter: '',
 };
 
 export const DEFAULT_CASE_STUDIES: CaseStudy[] = [

@@ -8,21 +8,20 @@ import {
     Textarea,
     VStack,
     SimpleGrid,
-    Select,
     IconButton,
     InputGroup,
     InputRightElement,
     Heading,
     Flex,
-    Text,
     Image,
     useToast,
     Tag,
     TagLabel,
     TagCloseButton,
     HStack,
+    Text,
 } from '@chakra-ui/react';
-import { Plus, Trash2, ChevronLeft, Upload, X } from 'lucide-react';
+import { Plus, ChevronLeft, Upload, X } from 'lucide-react';
 import { CaseStudy } from '../types/portfolioBuilderTypes';
 
 interface CaseStudyEditorProps {
@@ -39,15 +38,20 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
     onSave,
 }) => {
     const [newTech, setNewTech] = React.useState('');
+    const [imageLinks, setImageLinks] = React.useState<string[]>(['']);
     const toast = useToast();
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            setEditingCaseStudy({
-                ...editingCaseStudy,
-                images: [...editingCaseStudy.images, URL.createObjectURL(file)]
-            });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditingCaseStudy({
+                    ...editingCaseStudy,
+                    images: [...(editingCaseStudy?.images || []), reader.result as string]
+                });
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -55,10 +59,49 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
         if (newTech.trim()) {
             setEditingCaseStudy({
                 ...editingCaseStudy,
-                technologies: [...editingCaseStudy.technologies, newTech.trim()]
+                technologies: [...(editingCaseStudy?.technologies || []), newTech.trim()]
             });
             setNewTech('');
         }
+    };
+
+    const handleImageLinkChange = (index: number, value: string) => {
+        const newImageLinks = [...imageLinks];
+        newImageLinks[index] = value;
+        setImageLinks(newImageLinks);
+    };
+
+    const handleAddImageLinkField = () => {
+        setImageLinks([...imageLinks, '']);
+    };
+
+    const handleRemoveImageLinkField = (index: number) => {
+        const newImageLinks = imageLinks.filter((_, i) => i !== index);
+        setImageLinks(newImageLinks);
+    };
+
+    const handleSaveImageLinks = () => {
+        const validLinks = imageLinks.filter(link => link.trim() !== '');
+        if (validLinks.length > 0) {
+            setEditingCaseStudy({
+                ...editingCaseStudy,
+                images: [...(editingCaseStudy?.images || []), ...validLinks]
+            });
+            setImageLinks(['']);
+            toast({
+                title: 'Image links added',
+                status: 'success',
+                duration: 2000,
+                isClosable: true,
+            });
+        }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        setEditingCaseStudy({
+            ...editingCaseStudy,
+            images: (editingCaseStudy?.images || []).filter((_: string, i: number) => i !== index)
+        });
     };
 
     return (
@@ -192,10 +235,10 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
                 <FormControl gridColumn={{ md: 'span 2' }}>
                     <FormLabel>Results</FormLabel>
                     <Textarea
-                        value={editingCaseStudy.outcome}
+                        value={editingCaseStudy.results}
                         onChange={(e) => setEditingCaseStudy({
                             ...editingCaseStudy,
-                            outcome: e.target.value
+                            results: e.target.value
                         })}
                         placeholder="What were the outcomes?"
                         size="md"
@@ -220,7 +263,7 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
                         />
                     </HStack>
                     <HStack spacing={2} flexWrap="wrap">
-                        {editingCaseStudy.technologies.map((tech, index) => (
+                        {editingCaseStudy?.technologies?.map((tech, index) => (
                             <Tag
                                 key={index}
                                 size="md"
@@ -231,7 +274,7 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
                                 <TagLabel>{tech}</TagLabel>
                                 <TagCloseButton onClick={() => setEditingCaseStudy({
                                     ...editingCaseStudy,
-                                    technologies: editingCaseStudy.technologies.filter((_, i) => i !== index)
+                                    technologies: (editingCaseStudy?.technologies || []).filter((_, i) => i !== index)
                                 })} />
                             </Tag>
                         ))}
@@ -240,63 +283,91 @@ export const CaseStudyEditor: React.FC<CaseStudyEditorProps> = ({
 
                 <FormControl gridColumn={{ md: 'span 2' }}>
                     <FormLabel>Project Images</FormLabel>
-                    <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-                        {editingCaseStudy.images.map((image, index) => (
-                            <Box key={index} position="relative">
-                                <Image
-                                    src={image}
-                                    alt={`Project image ${index + 1}`}
-                                    borderRadius="md"
-                                    objectFit="cover"
-                                    height="200px"
-                                    width="100%"
+                    <VStack spacing={4} align="stretch">
+                        {/* Image Upload */}
+                        <Box>
+                            <Text mb={2} fontSize="sm" color="gray.600">Upload Images</Text>
+                            <InputGroup size="md">
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    p={1}
                                 />
-                                <IconButton
-                                    aria-label="Remove image"
-                                    icon={<X />}
-                                    size="sm"
-                                    position="absolute"
-                                    top={2}
-                                    right={2}
-                                    onClick={() => setEditingCaseStudy({
-                                        ...editingCaseStudy,
-                                        images: editingCaseStudy.images.filter((_, i) => i !== index)
-                                    })}
-                                    colorScheme="red"
-                                />
-                            </Box>
-                        ))}
-                        <Box
-                            border="2px dashed"
-                            borderColor="gray.200"
-                            borderRadius="md"
-                            p={4}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            height="200px"
-                            cursor="pointer"
-                            _hover={{ borderColor: 'blue.500' }}
-                        >
-                            <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                display="none"
-                                id="image-upload"
-                            />
-                            <label htmlFor="image-upload">
-                                <Button
-                                    as="span"
-                                    leftIcon={<Upload />}
-                                    variant="outline"
-                                    cursor="pointer"
-                                >
-                                    Add Image
-                                </Button>
-                            </label>
+                                <InputRightElement width="4.5rem">
+                                    <Button h="1.75rem" size="sm" variant="ghost">
+                                        Upload
+                                    </Button>
+                                </InputRightElement>
+                            </InputGroup>
                         </Box>
-                    </SimpleGrid>
+
+                        {/* Image Links */}
+                        <Box>
+                            <Text mb={2} fontSize="sm" color="gray.600">Image Links</Text>
+                            <VStack spacing={2} align="stretch">
+                                {imageLinks.map((link, index) => (
+                                    <HStack key={index} spacing={2}>
+                                        <Input
+                                            value={link}
+                                            onChange={(e) => handleImageLinkChange(index, e.target.value)}
+                                            placeholder="Add image URL"
+                                            size="md"
+                                        />
+                                        <IconButton
+                                            aria-label="Remove field"
+                                            icon={<X />}
+                                            onClick={() => handleRemoveImageLinkField(index)}
+                                            size="md"
+                                            isDisabled={imageLinks.length === 1}
+                                        />
+                                    </HStack>
+                                ))}
+                                <Button
+                                    leftIcon={<Plus />}
+                                    onClick={handleAddImageLinkField}
+                                    size="sm"
+                                    alignSelf="flex-start"
+                                >
+                                    Add Another Link
+                                </Button>
+                                <Button
+                                    colorScheme="blue"
+                                    onClick={handleSaveImageLinks}
+                                    size="sm"
+                                    alignSelf="flex-start"
+                                >
+                                    Save Image Links
+                                </Button>
+                            </VStack>
+                        </Box>
+
+                        {/* Media Preview Grid */}
+                        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mt={4}>
+                            {editingCaseStudy?.images?.map((image, index) => (
+                                <Box key={`img-${index}`} position="relative">
+                                    <Image
+                                        src={image}
+                                        alt={`Project image ${index + 1}`}
+                                        borderRadius="md"
+                                        objectFit="cover"
+                                        width="100%"
+                                        height="200px"
+                                    />
+                                    <IconButton
+                                        aria-label="Remove image"
+                                        icon={<X />}
+                                        size="sm"
+                                        position="absolute"
+                                        top={2}
+                                        right={2}
+                                        colorScheme="red"
+                                        onClick={() => handleRemoveImage(index)}
+                                    />
+                                </Box>
+                            ))}
+                        </SimpleGrid>
+                    </VStack>
                 </FormControl>
             </SimpleGrid>
         </VStack>

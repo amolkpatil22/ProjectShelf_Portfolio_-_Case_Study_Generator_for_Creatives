@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
     Container,
@@ -31,6 +31,8 @@ import { usePortfolioBuilder } from './hooks/usePortfolioBuilder';
 import { CaseStudyEditor } from './components/CaseStudyEditor';
 import { CaseStudyList } from './components/CaseStudyList';
 import { PortfolioSettings } from './components/PortfolioSettings';
+import { AboutSection } from './components/AboutSection';
+import { ContactSection } from './components/ContactSection';
 
 const PortfolioBuilder = () => {
     const {
@@ -97,7 +99,13 @@ const PortfolioBuilder = () => {
 
                             <TabPanels>
                                 <TabPanel>
-                                    {/* About section content */}
+                                    <AboutSection
+                                        name={themeSettings.name || ''}
+                                        title={themeSettings.title || ''}
+                                        bio={themeSettings.bio || ''}
+                                        profileImage={themeSettings.profileImage || ''}
+                                        onUpdate={(field, value) => updateTheme(field, value)}
+                                    />
                                 </TabPanel>
 
                                 <TabPanel>
@@ -119,7 +127,14 @@ const PortfolioBuilder = () => {
                                 </TabPanel>
 
                                 <TabPanel>
-                                    {/* Contact section content */}
+                                    <ContactSection
+                                        email={themeSettings.email || ''}
+                                        linkedin={themeSettings.linkedin || ''}
+                                        github={themeSettings.github || ''}
+                                        website={themeSettings.website || ''}
+                                        twitter={themeSettings.twitter || ''}
+                                        onUpdate={(field, value) => updateTheme(field, value)}
+                                    />
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>
@@ -183,4 +198,4 @@ const PortfolioBuilder = () => {
     );
 };
 
-export default PortfolioBuilder; 
+export default PortfolioBuilder;

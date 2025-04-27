@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -18,11 +18,13 @@ import {
     AlertIcon,
 } from '@chakra-ui/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useLogin } from './hooks/useLogin';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const location = useLocation();
     const {
         email,
         setEmail,
@@ -32,6 +34,13 @@ const Login = () => {
         error,
         handleLogin,
     } = useLogin();
+
+    useEffect(() => {
+        // Check if there's a success message from signup
+        if (location.state && (location.state as any).message) {
+            setSuccessMessage((location.state as any).message);
+        }
+    }, [location]);
 
     return (
         <Box minH="100vh" bg="gray.50" py={20}>
@@ -58,6 +67,13 @@ const Login = () => {
                                 Sign in to continue building your portfolio
                             </Text>
                         </VStack>
+
+                        {successMessage && (
+                            <Alert status="success" borderRadius="md">
+                                <AlertIcon />
+                                {successMessage}
+                            </Alert>
+                        )}
 
                         {error && (
                             <Alert status="error" borderRadius="md">

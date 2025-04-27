@@ -10,6 +10,9 @@ import {
 } from './types';
 import { SignupRequest, SignupResponse } from '../pages/signup/types/signupTypes';
 
+// Create a type without confirmPassword
+type SignupRequestWithoutConfirm = Omit<SignupRequest, 'confirmPassword'>;
+
 // Auth API calls
 export const authApi = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -17,8 +20,8 @@ export const authApi = {
         return response.data;
     },
 
-    signup: async (data: SignupRequest): Promise<SignupResponse> => {
-        const response = await axiosInstance.post<SignupResponse>('/auth/signup', data);
+    signup: async (data: SignupRequestWithoutConfirm): Promise<SignupResponse> => {
+        const response = await axiosInstance.post<SignupResponse>('/users', data);
         return response.data;
     },
 

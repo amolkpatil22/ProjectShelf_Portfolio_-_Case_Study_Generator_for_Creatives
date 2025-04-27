@@ -29,6 +29,11 @@ export const useSignupForm = (): UseSignupFormReturn => {
             ...prev,
             [name]: value
         }));
+
+        // Clear password mismatch error when user types in either password field
+        if (name === 'password' || name === 'confirmPassword') {
+            setError(null);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -39,13 +44,27 @@ export const useSignupForm = (): UseSignupFormReturn => {
         try {
             // Validate passwords match
             if (formData.password !== formData.confirmPassword) {
-                throw new Error('Passwords do not match');
+                setError('Passwords do not match. Please make sure both passwords are identical.');
+                setIsLoading(false);
+                return;
+            }
+
+            // Validate password strength
+            if (formData.password.length < 8) {
+                setError('Password must be at least 8 characters long.');
+                setIsLoading(false);
+                return;
             }
 
             const response = await signupUser(formData);
 
             if (response.success) {
-                navigate('/builder');
+                // Redirect to login page on successful signup
+                navigate('/login', {
+                    state: {
+                        message: 'Account created successfully! Please log in with your credentials.'
+                    }
+                });
             } else {
                 setError(response.errors?.[0] || 'Signup failed. Please try again.');
             }

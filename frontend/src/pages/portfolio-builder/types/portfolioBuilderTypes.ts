@@ -2,6 +2,15 @@ export interface ThemeSettings {
     primaryColor: string;
     fontFamily: string;
     layout: string;
+    name: string;
+    title: string;
+    bio: string;
+    profileImage: string;
+    email: string;
+    linkedin: string;
+    github: string;
+    website: string;
+    twitter: string;
 }
 
 export interface TimelineEvent {
@@ -20,6 +29,7 @@ export interface CaseStudy {
     results: string;
     technologies: string[];
     images: string[];
+    videos: string[];
     role: string;
     duration: string;
     teamSize: string;

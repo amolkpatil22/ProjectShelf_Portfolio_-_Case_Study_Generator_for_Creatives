@@ -4,13 +4,8 @@ import { ApiResponse } from '../../../axios/types';
 
 export const signupUser = async (data: SignupRequest): Promise<ApiResponse<SignupResponse>> => {
     try {
-        const response = await authApi.signup(data);
-
-        // Store the tokens and user data
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
-        localStorage.setItem('user', JSON.stringify(response.user));
+        const { confirmPassword, ...signupData } = data;
+        const response = await authApi.signup(signupData);
 
         return {
             success: true,

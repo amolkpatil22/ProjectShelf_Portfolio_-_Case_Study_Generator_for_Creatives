@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -17,14 +17,16 @@ import {
     Flex,
     Alert,
     AlertIcon,
+    FormErrorMessage,
 } from '@chakra-ui/react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Check, X } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useSignupForm } from './hooks/useSignupForm';
 
 const Signup = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null);
     const {
         formData,
         isLoading,
@@ -32,6 +34,15 @@ const Signup = () => {
         handleChange,
         handleSubmit,
     } = useSignupForm();
+
+    // Check if passwords match whenever either password field changes
+    useEffect(() => {
+        if (formData.password && formData.confirmPassword) {
+            setPasswordsMatch(formData.password === formData.confirmPassword);
+        } else {
+            setPasswordsMatch(null);
+        }
+    }, [formData.password, formData.confirmPassword]);
 
     return (
         <Box minH="100vh" bg="gray.50" py={20}>
@@ -113,7 +124,7 @@ const Signup = () => {
                                     />
                                 </FormControl>
 
-                                <FormControl isRequired>
+                                <FormControl isRequired isInvalid={passwordsMatch === false}>
                                     <FormLabel>Password</FormLabel>
                                     <InputGroup size="lg">
                                         <Input
@@ -122,9 +133,9 @@ const Signup = () => {
                                             value={formData.password}
                                             onChange={handleChange}
                                             placeholder="Create a password"
-                                            borderColor="gray.200"
-                                            _hover={{ borderColor: 'primary.400' }}
-                                            _focus={{ borderColor: 'primary.400', boxShadow: 'none' }}
+                                            borderColor={passwordsMatch === false ? "red.300" : "gray.200"}
+                                            _hover={{ borderColor: passwordsMatch === false ? "red.400" : 'primary.400' }}
+                                            _focus={{ borderColor: passwordsMatch === false ? "red.400" : 'primary.400', boxShadow: 'none' }}
                                         />
                                         <InputRightElement>
                                             <IconButton
@@ -135,9 +146,14 @@ const Signup = () => {
                                             />
                                         </InputRightElement>
                                     </InputGroup>
+                                    {formData.password && (
+                                        <Text fontSize="sm" color="gray.500" mt={1}>
+                                            Password must be at least 8 characters long
+                                        </Text>
+                                    )}
                                 </FormControl>
 
-                                <FormControl isRequired>
+                                <FormControl isRequired isInvalid={passwordsMatch === false}>
                                     <FormLabel>Confirm Password</FormLabel>
                                     <InputGroup size="lg">
                                         <Input
@@ -146,9 +162,9 @@ const Signup = () => {
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             placeholder="Confirm your password"
-                                            borderColor="gray.200"
-                                            _hover={{ borderColor: 'primary.400' }}
-                                            _focus={{ borderColor: 'primary.400', boxShadow: 'none' }}
+                                            borderColor={passwordsMatch === false ? "red.300" : "gray.200"}
+                                            _hover={{ borderColor: passwordsMatch === false ? "red.400" : 'primary.400' }}
+                                            _focus={{ borderColor: passwordsMatch === false ? "red.400" : 'primary.400', boxShadow: 'none' }}
                                         />
                                         <InputRightElement>
                                             <IconButton
@@ -159,6 +175,11 @@ const Signup = () => {
                                             />
                                         </InputRightElement>
                                     </InputGroup>
+                                    {formData.confirmPassword && (
+                                        <FormErrorMessage>
+                                            {passwordsMatch === false ? "Passwords do not match" : ""}
+                                        </FormErrorMessage>
+                                    )}
                                 </FormControl>
 
                                 <Button
@@ -171,6 +192,7 @@ const Signup = () => {
                                     _hover={{
                                         bgGradient: "linear(to-r, primary.500, accent.500)",
                                     }}
+                                    isDisabled={passwordsMatch === false}
                                 >
                                     Create Account
                                 </Button>
