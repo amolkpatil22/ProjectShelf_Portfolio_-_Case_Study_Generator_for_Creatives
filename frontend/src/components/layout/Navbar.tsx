@@ -12,7 +12,7 @@ import {
   Container
 } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Layers } from 'lucide-react';
+import { Menu, X, Layers, Home, FolderKanban, Settings, BarChart } from 'lucide-react';
 
 const Navbar = () => {
   const { isOpen, onToggle } = useDisclosure();
@@ -21,14 +21,30 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+  // Define routes that should only be visible on landing page
+  const landingPageRoutes = [
+    { path: '/#features', label: 'Features' },
+    { path: '/#casestudies', label: 'Case Studies' },
+    { path: '/#themes', label: 'Themes' },
+    { path: '/#analytics', label: 'Analytics' },
+    { path: '/#pricing', label: 'Pricing' }
+  ];
+
+  // Define routes for logged-in users
+  const loggedInRoutes = [
+    { path: '/dashboard', label: 'Dashboard', icon: <Home size={18} /> },
+    { path: '/builder', label: 'Portfolio Builder', icon: <FolderKanban size={18} /> },
+    { path: '/analytics', label: 'Analytics', icon: <BarChart size={18} /> },
+  ];
+
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (location.pathname === '/') {
-      // If already on home page, scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (isLoggedIn) {
+      // If logged in, navigate to dashboard
+      navigate('/dashboard');
     } else {
-      // If on another page, navigate to home page
+      // If not logged in, navigate to home page
       navigate('/');
     }
   };
@@ -43,62 +59,37 @@ const Navbar = () => {
 
   return (
     <Box
+      position={isLoggedIn === false ? "fixed" : "relative"}
       as="nav"
-      position="sticky"
-      top="0"
-      zIndex="1000"
-      bg="white"
-      boxShadow="sm"
-      backdropFilter="blur(10px)"
       w="100%"
+      zIndex="sticky"
+      bg="white"
+      borderBottom="1px"
+      borderColor="gray.200"
+      py={4}
     >
       <Container maxW="container.xl">
-        <Flex
-          h={{ base: '70px', md: '80px' }}
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Flex alignItems="center">
-            <ChakraLink
-              as="a"
-              href="#"
-              _hover={{ textDecoration: 'none' }}
-              onClick={handleLogoClick}
+        <Flex justify="space-between" align="center">
+          <ChakraLink
+            as="a"
+            href="#"
+            onClick={handleLogoClick}
+            display="flex"
+            alignItems="center"
+            gap={2}
+          >
+            <Layers size={24} />
+            <Text
+              fontSize="xl"
+              fontWeight="bold"
+              bgGradient="linear(to-r, primary.400, accent.400)"
+              bgClip="text"
             >
-              <Flex alignItems="center" mr={4}>
-                <Layers size={28} color="#3358FF" />
-                <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  ml={2}
-                  fontFamily="heading"
-                  bgGradient="linear(to-r, primary.400, accent.400)"
-                  bgClip="text"
-                >
-                  ProjectShelf
-                </Text>
-              </Flex>
-            </ChakraLink>
+              ProjectShelf
+            </Text>
+          </ChakraLink>
 
-            <Stack
-              display={{ base: 'none', md: 'flex' }}
-              direction="row"
-              spacing={8}
-              alignItems="center"
-              fontWeight="500"
-              ml={6}
-            >
-              <ChakraLink as={RouterLink} to="/#features">Features</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#casestudies">Case Studies</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#themes">Themes</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#analytics">Analytics</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#pricing">Pricing</ChakraLink>
-              {isLoggedIn && (
-                <ChakraLink as={RouterLink} to="/builder" color="primary.400">Portfolio Builder</ChakraLink>
-              )}
-            </Stack>
-          </Flex>
-
+          {/* Desktop Navigation */}
           <Stack
             display={{ base: 'none', md: 'flex' }}
             direction="row"
@@ -106,16 +97,43 @@ const Navbar = () => {
             alignItems="center"
           >
             {isLoggedIn ? (
-              <Button
-                variant="outline"
-                size="md"
-                onClick={handleLogout}
-                colorScheme="red"
-              >
-                Log Out
-              </Button>
-            ) : (
+              // Show logged-in user navigation
               <>
+                {loggedInRoutes.map((route) => (
+                  <Button
+                    key={route.path}
+                    as={RouterLink}
+                    to={route.path}
+                    variant="ghost"
+                    size="md"
+                    leftIcon={route.icon}
+                  >
+                    {route.label}
+                  </Button>
+                ))}
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={handleLogout}
+                  colorScheme="red"
+                >
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              // Show landing page navigation
+              <>
+                {landingPageRoutes.map((route) => (
+                  <Button
+                    key={route.path}
+                    as={RouterLink}
+                    to={route.path}
+                    variant="ghost"
+                    size="md"
+                  >
+                    {route.label}
+                  </Button>
+                ))}
                 <Button
                   as={RouterLink}
                   to="/login"
@@ -150,39 +168,56 @@ const Navbar = () => {
         </Flex>
 
         {/* Mobile menu */}
-        {isMobile && isOpen && (
+        {isOpen && (
           <Box
+            display={{ base: 'block', md: 'none' }}
+            mt={4}
             py={4}
-            display={{ md: 'none' }}
-            position="absolute"
-            top="70px"
-            left={0}
-            right={0}
-            bg="white"
-            boxShadow="md"
-            zIndex={2}
+            borderTop="1px"
+            borderColor="gray.200"
           >
-            <Stack spacing={4} px={4}>
-              <ChakraLink as={RouterLink} to="/#features" py={2} fontWeight="500">Features</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#casestudies" py={2} fontWeight="500">Case Studies</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#themes" py={2} fontWeight="500">Themes</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#analytics" py={2} fontWeight="500">Analytics</ChakraLink>
-              <ChakraLink as={RouterLink} to="/#pricing" py={2} fontWeight="500">Pricing</ChakraLink>
-              {isLoggedIn && (
-                <ChakraLink as={RouterLink} to="/builder" py={2} fontWeight="500" color="primary.400">Portfolio Builder</ChakraLink>
-              )}
+            <Stack spacing={4}>
               {isLoggedIn ? (
-                <Button
-                  variant="outline"
-                  w="full"
-                  my={2}
-                  onClick={handleLogout}
-                  colorScheme="red"
-                >
-                  Log Out
-                </Button>
-              ) : (
+                // Show logged-in user navigation for mobile
                 <>
+                  {loggedInRoutes.map((route) => (
+                    <Button
+                      key={route.path}
+                      as={RouterLink}
+                      to={route.path}
+                      variant="ghost"
+                      w="full"
+                      justifyContent="flex-start"
+                      leftIcon={route.icon}
+                    >
+                      {route.label}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    w="full"
+                    my={2}
+                    onClick={handleLogout}
+                    colorScheme="red"
+                  >
+                    Log Out
+                  </Button>
+                </>
+              ) : (
+                // Show landing page navigation for mobile
+                <>
+                  {landingPageRoutes.map((route) => (
+                    <Button
+                      key={route.path}
+                      as={RouterLink}
+                      to={route.path}
+                      variant="ghost"
+                      w="full"
+                      justifyContent="flex-start"
+                    >
+                      {route.label}
+                    </Button>
+                  ))}
                   <Button
                     as={RouterLink}
                     to="/login"

@@ -16,6 +16,7 @@ import {
     Divider,
     Flex,
     Avatar,
+    SimpleGrid,
 } from '@chakra-ui/react';
 import { ArrowLeft, ExternalLink, Github, Linkedin, Mail } from 'lucide-react';
 
@@ -29,6 +30,13 @@ interface CaseStudy {
     challenge: string;
     solution: string;
     outcome: string;
+    images: string[];
+    videoLinks: string[];
+    timeline: Array<{
+        date: string;
+        title: string;
+        description: string;
+    }>;
 }
 
 const sampleCaseStudy: CaseStudy = {
@@ -40,7 +48,31 @@ const sampleCaseStudy: CaseStudy = {
     tools: ['Figma', 'React', 'Node.js'],
     challenge: 'The client needed to improve their conversion rate and user engagement.',
     solution: 'Implemented a new user-centered design with improved navigation and checkout flow.',
-    outcome: 'Increased conversions by 47% and reduced cart abandonment by 30%.'
+    outcome: 'Increased conversions by 47% and reduced cart abandonment by 30%.',
+    images: [
+        'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg',
+        'https://images.pexels.com/photos/6804065/pexels-photo-6804065.jpeg'
+    ],
+    videoLinks: [
+        'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    ],
+    timeline: [
+        {
+            date: '2023-01-15',
+            title: 'Project Kickoff',
+            description: 'Initial meeting with client to discuss requirements'
+        },
+        {
+            date: '2023-02-01',
+            title: 'Research Phase',
+            description: 'User research and competitor analysis completed'
+        },
+        {
+            date: '2023-03-15',
+            title: 'Design Phase',
+            description: 'Wireframes and mockups approved'
+        }
+    ]
 };
 
 interface CaseStudyDetailProps {
@@ -131,6 +163,86 @@ const MinimalTheme = ({ caseStudy }: { caseStudy: CaseStudy }) => {
                             </HStack>
                         </VStack>
                     </Grid>
+
+                    {/* Media Gallery */}
+                    <Box>
+                        <Heading size="lg" mb={6}>Media Gallery</Heading>
+                        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                            {caseStudy.images.map((image, index) => (
+                                <Box
+                                    key={index}
+                                    borderRadius="lg"
+                                    overflow="hidden"
+                                    boxShadow="md"
+                                >
+                                    <Image
+                                        src={image}
+                                        alt={`Gallery image ${index + 1}`}
+                                        w="full"
+                                        h="250px"
+                                        objectFit="cover"
+                                    />
+                                </Box>
+                            ))}
+                        </SimpleGrid>
+                    </Box>
+
+                    {/* Video Links */}
+                    {caseStudy.videoLinks.length > 0 && (
+                        <Box>
+                            <Heading size="lg" mb={6}>Videos</Heading>
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                                {caseStudy.videoLinks.map((link, index) => (
+                                    <Box
+                                        key={index}
+                                        borderRadius="lg"
+                                        overflow="hidden"
+                                        boxShadow="md"
+                                        position="relative"
+                                        paddingTop="56.25%"
+                                    >
+                                        <iframe
+                                            src={link}
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                border: 0
+                                            }}
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        />
+                                    </Box>
+                                ))}
+                            </SimpleGrid>
+                        </Box>
+                    )}
+
+                    {/* Timeline */}
+                    <Box>
+                        <Heading size="lg" mb={6}>Development Timeline</Heading>
+                        <VStack spacing={4} align="stretch">
+                            {caseStudy.timeline.map((event, index) => (
+                                <Box
+                                    key={index}
+                                    p={6}
+                                    borderRadius="lg"
+                                    borderWidth="1px"
+                                    position="relative"
+                                >
+                                    <Flex justify="space-between" align="center" mb={2}>
+                                        <Badge colorScheme="purple">
+                                            {new Date(event.date).toLocaleDateString()}
+                                        </Badge>
+                                        <Heading size="md">{event.title}</Heading>
+                                    </Flex>
+                                    <Text color="gray.600">{event.description}</Text>
+                                </Box>
+                            ))}
+                        </VStack>
+                    </Box>
                 </VStack>
             </Container>
         </Box>
@@ -223,6 +335,132 @@ const CreativeTheme = ({ caseStudy }: { caseStudy: CaseStudy }) => {
                                 <Heading size="lg" mb={4}>Outcome</Heading>
                                 <Text fontSize="lg" color="gray.600">{caseStudy.outcome}</Text>
                             </Box>
+                        </VStack>
+                    </Box>
+
+                    {/* Media Gallery */}
+                    <Box w="full">
+                        <Heading size="xl" mb={8}>Media Gallery</Heading>
+                        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+                            {caseStudy.images.map((image, index) => (
+                                <Box
+                                    key={index}
+                                    position="relative"
+                                    borderRadius="xl"
+                                    overflow="hidden"
+                                    boxShadow="xl"
+                                >
+                                    <Box
+                                        position="absolute"
+                                        top="-10px"
+                                        left="-10px"
+                                        right="10px"
+                                        bottom="10px"
+                                        bg={index % 2 === 0 ? 'primary.400' : 'accent.400'}
+                                        opacity={0.1}
+                                        borderRadius="xl"
+                                    />
+                                    <Image
+                                        src={image}
+                                        alt={`Gallery image ${index + 1}`}
+                                        w="full"
+                                        h="300px"
+                                        objectFit="cover"
+                                        position="relative"
+                                        zIndex={1}
+                                    />
+                                </Box>
+                            ))}
+                        </SimpleGrid>
+                    </Box>
+
+                    {/* Video Links */}
+                    {caseStudy.videoLinks.length > 0 && (
+                        <Box w="full">
+                            <Heading size="xl" mb={8}>Videos</Heading>
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
+                                {caseStudy.videoLinks.map((link, index) => (
+                                    <Box
+                                        key={index}
+                                        position="relative"
+                                        borderRadius="xl"
+                                        overflow="hidden"
+                                        boxShadow="xl"
+                                    >
+                                        <Box
+                                            position="absolute"
+                                            top="-10px"
+                                            left="-10px"
+                                            right="10px"
+                                            bottom="10px"
+                                            bg={index % 2 === 0 ? 'primary.400' : 'accent.400'}
+                                            opacity={0.1}
+                                            borderRadius="xl"
+                                        />
+                                        <Box
+                                            position="relative"
+                                            paddingTop="56.25%"
+                                            zIndex={1}
+                                        >
+                                            <iframe
+                                                src={link}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    border: 0
+                                                }}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        </Box>
+                                    </Box>
+                                ))}
+                            </SimpleGrid>
+                        </Box>
+                    )}
+
+                    {/* Timeline */}
+                    <Box w="full">
+                        <Heading size="xl" mb={8}>Development Timeline</Heading>
+                        <VStack spacing={6} align="stretch">
+                            {caseStudy.timeline.map((event, index) => (
+                                <Box
+                                    key={index}
+                                    position="relative"
+                                    p={8}
+                                    borderRadius="xl"
+                                    borderWidth="1px"
+                                    bg="white"
+                                >
+                                    <Box
+                                        position="absolute"
+                                        top="-10px"
+                                        left="-10px"
+                                        right="10px"
+                                        bottom="10px"
+                                        bg={index % 2 === 0 ? 'primary.400' : 'accent.400'}
+                                        opacity={0.1}
+                                        borderRadius="xl"
+                                    />
+                                    <VStack align="start" spacing={4} position="relative" zIndex={1}>
+                                        <Badge
+                                            fontSize="sm"
+                                            color="white"
+                                            bg={index % 2 === 0 ? 'primary.400' : 'accent.400'}
+                                            px={3}
+                                            py={1}
+                                            borderRadius="full"
+                                        >
+                                            {new Date(event.date).toLocaleDateString()}
+                                        </Badge>
+                                        <Heading size="lg">{event.title}</Heading>
+                                        <Text fontSize="lg" color="gray.600">{event.description}</Text>
+                                    </VStack>
+                                </Box>
+                            ))}
                         </VStack>
                     </Box>
 
@@ -356,14 +594,136 @@ const BoldTheme = ({ caseStudy }: { caseStudy: CaseStudy }) => {
                         </VStack>
                     </Box>
 
-                    <HStack spacing={6} w="full">
+                    {/* Media Gallery */}
+                    <Box w="full">
+                        <Heading size="2xl" mb={8}>Media Gallery</Heading>
+                        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+                            {caseStudy.images.map((image, index) => (
+                                <Box
+                                    key={index}
+                                    bg="gray.900"
+                                    borderRadius="2xl"
+                                    overflow="hidden"
+                                    position="relative"
+                                >
+                                    <Box
+                                        position="absolute"
+                                        top="-10px"
+                                        left="-10px"
+                                        right="10px"
+                                        bottom="10px"
+                                        bg="primary.400"
+                                        opacity={0.3}
+                                        borderRadius="2xl"
+                                    />
+                                    <Image
+                                        src={image}
+                                        alt={`Gallery image ${index + 1}`}
+                                        w="full"
+                                        h="300px"
+                                        objectFit="cover"
+                                        position="relative"
+                                        zIndex={1}
+                                    />
+                                </Box>
+                            ))}
+                        </SimpleGrid>
+                    </Box>
+
+                    {/* Video Links */}
+                    {caseStudy.videoLinks.length > 0 && (
+                        <Box w="full">
+                            <Heading size="2xl" mb={8}>Videos</Heading>
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
+                                {caseStudy.videoLinks.map((link, index) => (
+                                    <Box
+                                        key={index}
+                                        bg="gray.900"
+                                        borderRadius="2xl"
+                                        overflow="hidden"
+                                        position="relative"
+                                    >
+                                        <Box
+                                            position="absolute"
+                                            top="-10px"
+                                            left="-10px"
+                                            right="10px"
+                                            bottom="10px"
+                                            bg="primary.400"
+                                            opacity={0.3}
+                                            borderRadius="2xl"
+                                        />
+                                        <Box
+                                            position="relative"
+                                            paddingTop="56.25%"
+                                            zIndex={1}
+                                        >
+                                            <iframe
+                                                src={link}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    border: 0
+                                                }}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        </Box>
+                                    </Box>
+                                ))}
+                            </SimpleGrid>
+                        </Box>
+                    )}
+
+                    {/* Timeline */}
+                    <Box w="full">
+                        <Heading size="2xl" mb={8}>Development Timeline</Heading>
+                        <VStack spacing={8} align="stretch">
+                            {caseStudy.timeline.map((event, index) => (
+                                <Box
+                                    key={index}
+                                    bg="gray.900"
+                                    p={12}
+                                    borderRadius="2xl"
+                                    position="relative"
+                                >
+                                    <Box
+                                        position="absolute"
+                                        top="-10px"
+                                        left="-10px"
+                                        right="10px"
+                                        bottom="10px"
+                                        bg="primary.400"
+                                        opacity={0.3}
+                                        borderRadius="2xl"
+                                    />
+                                    <VStack align="start" spacing={6} position="relative" zIndex={1}>
+                                        <Badge
+                                            color="white"
+                                            bg="primary.400"
+                                            px={3}
+                                            py={1}
+                                            borderRadius="full"
+                                        >
+                                            {new Date(event.date).toLocaleDateString()}
+                                        </Badge>
+                                        <Heading size="xl">{event.title}</Heading>
+                                        <Text fontSize="xl" color="gray.400">{event.description}</Text>
+                                    </VStack>
+                                </Box>
+                            ))}
+                        </VStack>
+                    </Box>
+
+                    <HStack spacing={4} w="full">
                         <Button
                             leftIcon={<ExternalLink />}
-                            colorScheme="primary"
+                            colorScheme="whiteAlpha"
                             size="lg"
                             flex={1}
-                            height="60px"
-                            fontSize="lg"
                         >
                             View Live Project
                         </Button>
@@ -373,8 +733,6 @@ const BoldTheme = ({ caseStudy }: { caseStudy: CaseStudy }) => {
                             colorScheme="whiteAlpha"
                             size="lg"
                             flex={1}
-                            height="60px"
-                            fontSize="lg"
                         >
                             View Code
                         </Button>

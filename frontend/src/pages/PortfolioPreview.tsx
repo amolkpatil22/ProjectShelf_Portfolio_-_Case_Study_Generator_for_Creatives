@@ -53,7 +53,7 @@ const MinimalTheme = ({ data }: PreviewProps) => {
   return (
     <Box bg="white">
       <Container maxW="container.xl" py={20}>
-        <VStack spacing={20} align="stretch">
+        <VStack spacing={20} align="stretch" className="theme-content">
           {/* Hero Section */}
           <VStack spacing={6} align="center" textAlign="center">
             <Avatar size="2xl" src={data.avatar} />
@@ -131,7 +131,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
     <Box bg="gray.50">
       <Container maxW="container.xl" py={20}>
         {/* Hero Section */}
-        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={20} mb={20}>
+        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={20} mb={20} className="theme-content">
           <Box position="relative">
             <Box
               position="absolute"
@@ -174,7 +174,7 @@ const CreativeTheme = ({ data }: PreviewProps) => {
         </Grid>
 
         {/* Case Studies */}
-        <VStack spacing={16}>
+        <VStack spacing={16} className="theme-content">
           {data.caseStudies.map((study, index) => (
             <Flex
               key={study.id}
@@ -254,6 +254,7 @@ const BoldTheme = ({ data }: PreviewProps) => {
           display="flex"
           alignItems="center"
           mb={20}
+          className="theme-content"
         >
           <Grid
             templateColumns={{ base: '1fr', lg: '1.5fr 1fr' }}
@@ -310,7 +311,7 @@ const BoldTheme = ({ data }: PreviewProps) => {
         </Box>
 
         {/* Case Studies */}
-        <VStack spacing={20}>
+        <VStack spacing={20} className="theme-content">
           <Heading size="2xl" textAlign="center">Featured Work</Heading>
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={12}>
             {data.caseStudies.map((study) => (
@@ -393,6 +394,47 @@ const BoldTheme = ({ data }: PreviewProps) => {
 const PortfolioPreview = () => {
   const [searchParams] = useSearchParams();
   const theme = (searchParams.get('theme') || 'minimal') as 'minimal' | 'creative' | 'bold';
+  const primaryColor = searchParams.get('color') || '#3358FF';
+  const fontFamily = searchParams.get('font') || 'Inter';
+
+  // Apply custom theme settings
+  React.useEffect(() => {
+    // Create a style element to inject custom CSS
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      :root {
+        --chakra-colors-primary-400: ${primaryColor};
+        --chakra-colors-primary-500: ${primaryColor};
+        --chakra-colors-accent-400: ${primaryColor};
+        --chakra-colors-accent-500: ${primaryColor};
+      }
+      
+      /* Apply font family to the entire body */
+      body {
+        font-family: "${fontFamily}", sans-serif;
+      }
+      
+      /* Create a class for theme-specific elements */
+      .theme-content {
+        --theme-primary-color: ${primaryColor};
+        --theme-accent-color: ${primaryColor};
+      }
+      
+      /* Ensure navbar and footer don't use theme colors */
+      nav, footer {
+        --chakra-colors-primary-400: #3358FF !important;
+        --chakra-colors-primary-500: #3358FF !important;
+        --chakra-colors-accent-400: #9061F9 !important;
+        --chakra-colors-accent-500: #9061F9 !important;
+      }
+    `;
+    document.head.appendChild(styleElement);
+
+    // Clean up on unmount
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, [primaryColor, fontFamily]);
 
   const sampleData = {
     name: "Sarah Anderson",
