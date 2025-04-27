@@ -43,7 +43,7 @@ export const portfolioApi = {
     },
 
     update: async (id: string, data: Partial<PortfolioRequest>): Promise<ApiResponse<PortfolioResponse>> => {
-        const response = await axiosInstance.put<ApiResponse<PortfolioResponse>>(`/portfolios/${id}`, data);
+        const response = await axiosInstance.patch<ApiResponse<PortfolioResponse>>(`/portfolios/${id}`, data);
         return response.data;
     },
 

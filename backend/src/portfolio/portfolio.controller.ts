@@ -29,6 +29,8 @@ export class PortfolioController {
         @Body() updatePortfolioDto: UpdatePortfolioDto,
         @Req() req: Request,
     ) {
+        // Exclude _id and userId from being updated
+
         return this.portfolioService.update(id, updatePortfolioDto, req.user);
     }
 
@@ -36,4 +38,4 @@ export class PortfolioController {
     remove(@Param('id') id: string, @Req() req: Request) {
         return this.portfolioService.remove(id, req.user);
     }
-} 
+}
