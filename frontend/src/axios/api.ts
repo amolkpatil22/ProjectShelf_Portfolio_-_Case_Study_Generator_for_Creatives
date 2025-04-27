@@ -8,11 +8,17 @@ import {
     CaseStudyRequest,
     CaseStudyResponse,
 } from './types';
+import { SignupRequest, SignupResponse } from '../pages/signup/types/signupTypes';
 
 // Auth API calls
 export const authApi = {
     login: async (data: LoginRequest): Promise<LoginResponse> => {
         const response = await axiosInstance.post<LoginResponse>('/auth/login', data);
+        return response.data;
+    },
+
+    signup: async (data: SignupRequest): Promise<SignupResponse> => {
+        const response = await axiosInstance.post<SignupResponse>('/auth/signup', data);
         return response.data;
     },
 

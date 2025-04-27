@@ -10,72 +10,28 @@ import {
     VStack,
     Text,
     Link,
-    useToast,
     InputGroup,
     InputRightElement,
     IconButton,
     HStack,
     Flex,
+    Alert,
+    AlertIcon,
 } from '@chakra-ui/react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import { useSignupForm } from './hooks/useSignupForm';
 
 const Signup = () => {
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-    });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const toast = useToast();
-    const navigate = useNavigate();
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        try {
-            // Validate passwords match
-            if (formData.password !== formData.confirmPassword) {
-                throw new Error('Passwords do not match');
-            }
-
-            // TODO: Implement actual signup logic here
-            // For now, just simulate a successful signup
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            toast({
-                title: 'Account created successfully',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            });
-
-            navigate('/builder');
-        } catch (error) {
-            toast({
-                title: 'Signup failed',
-                description: error instanceof Error ? error.message : 'Please try again.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const {
+        formData,
+        isLoading,
+        error,
+        handleChange,
+        handleSubmit,
+    } = useSignupForm();
 
     return (
         <Box minH="100vh" bg="gray.50" py={20}>
@@ -102,6 +58,13 @@ const Signup = () => {
                                 Join us to start building your portfolio
                             </Text>
                         </VStack>
+
+                        {error && (
+                            <Alert status="error" borderRadius="md">
+                                <AlertIcon />
+                                {error}
+                            </Alert>
+                        )}
 
                         <Box as="form" onSubmit={handleSubmit} width="full">
                             <VStack spacing={6}>
@@ -227,4 +190,4 @@ const Signup = () => {
     );
 };
 
-export default Signup; 
+export default Signup;

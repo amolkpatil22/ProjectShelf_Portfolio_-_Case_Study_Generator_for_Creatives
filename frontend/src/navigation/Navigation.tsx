@@ -2,16 +2,15 @@ import { Routes } from "react-router-dom"
 import { Route } from "react-router-dom"
 import { BrowserRouter as Router } from "react-router-dom"
 import LandingPage from "../pages/LandingPage"
-import PortfolioBuilder from "../pages/PortfolioBuilder"
+import PortfolioBuilder from "../pages/portfolio-builder/PortfolioBuilder"
 import CaseStudyDetail from "../pages/CaseStudyDetail"
 import PortfolioPreview from "../pages/PortfolioPreview"
 import Login from "../pages/login/Login"
-import Signup from "../pages/Signup"
+import Signup from "../pages/signup/Signup"
 import AnalyticsDashboard from "../pages/AnalyticsDashboard"
 
 const Navigation = () => {
     return (
-
         <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
