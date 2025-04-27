@@ -54,6 +54,8 @@ export interface UsePortfolioBuilderReturn {
     selectedCaseStudy: CaseStudy | null;
     isEditing: boolean;
     editingCaseStudy: CaseStudy | null;
+    isLoading: boolean;
+    error: string | null;
     updateTheme: (key: keyof ThemeSettings, value: string) => void;
     handleEditCaseStudy: (caseStudy: CaseStudy) => void;
     handleUpdateCaseStudy: (updatedCaseStudy: CaseStudy) => void;

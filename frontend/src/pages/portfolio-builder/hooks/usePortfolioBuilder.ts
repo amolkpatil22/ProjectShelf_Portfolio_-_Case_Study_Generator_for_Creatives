@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeSettings, CaseStudy, UsePortfolioBuilderReturn } from '../types/portfolioBuilderTypes';
 import { DEFAULT_THEME_SETTINGS, DEFAULT_CASE_STUDIES } from '../constants/portfolioBuilderConstants';
-import { savePortfolio, getPortfolio, saveCaseStudy } from '../action/portfolioBuilderAction';
+import { savePortfolio, getPortfolio, saveCaseStudy, getPortfolioFromLocalStorage } from '../action/portfolioBuilderAction';
 
 export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
     const [themeSettings, setThemeSettings] = useState<ThemeSettings>(DEFAULT_THEME_SETTINGS);
@@ -11,9 +11,42 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
     const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editingCaseStudy, setEditingCaseStudy] = useState<CaseStudy | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const previewTimeoutRef = useRef<number | null>(null);
     const toast = useToast();
     const navigate = useNavigate();
+
+    // Fetch portfolio data when component mounts
+    useEffect(() => {
+        const fetchPortfolioData = async () => {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const response = await getPortfolioFromLocalStorage();
+
+                if (response.success && response.data) {
+                    // Update theme settings and case studies with fetched data
+                    if (response.data.themeSettings) {
+                        setThemeSettings(response.data.themeSettings);
+                    }
+
+                    if (response.data.caseStudies && response.data.caseStudies.length > 0) {
+                        setCaseStudies(response.data.caseStudies);
+                    }
+                } else {
+                    setError(response.errors?.[0] || 'Failed to fetch portfolio data');
+                }
+            } catch (err: any) {
+                setError(err.message || 'An error occurred while fetching portfolio data');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPortfolioData();
+    }, []);
 
     const updateTheme = (key: keyof ThemeSettings, value: string) => {
         setThemeSettings(prev => ({
@@ -89,6 +122,8 @@ export const usePortfolioBuilder = (): UsePortfolioBuilderReturn => {
         selectedCaseStudy,
         isEditing,
         editingCaseStudy,
+        isLoading,
+        error,
         updateTheme,
         handleEditCaseStudy,
         handleUpdateCaseStudy,

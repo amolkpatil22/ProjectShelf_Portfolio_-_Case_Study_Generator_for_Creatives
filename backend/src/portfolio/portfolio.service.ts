@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Portfolio, PortfolioDocument } from './entities/portfolio.entity';
 import { CreatePortfolioDto } from './dto/create-portfolio.dto';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
+import { use } from 'passport';
 
 @Injectable()
 export class PortfolioService {
@@ -25,8 +26,9 @@ export class PortfolioService {
     }
 
     async findOne(id: string, user: any) {
+
         const portfolio = await this.portfolioModel
-            .findOne({ _id: id, userId: user.sub })
+            .findOne({ _id: new Types.ObjectId(id), userId: new Types.ObjectId(user.sub) })
             .exec();
 
         if (!portfolio) {

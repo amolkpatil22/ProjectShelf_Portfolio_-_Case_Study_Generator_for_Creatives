@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './entities/user.entity';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
 import { mapToUserResponse } from './mappers/user.mapper';
@@ -116,7 +116,7 @@ export class UsersService {
     }
 
     async getPortfolioId(userId: string): Promise<string | null> {
-        const portfolio = await this.portfolioModel.findOne({ userId }).exec();
+        const portfolio = await this.portfolioModel.findOne({ userId: new Types.ObjectId(userId) }).exec()
         return portfolio ? (portfolio as any)._id.toString() : null;
     }
 } 

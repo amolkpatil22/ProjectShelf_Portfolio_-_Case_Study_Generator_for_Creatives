@@ -25,6 +25,12 @@ import {
     ModalContent,
     ModalBody,
     ModalCloseButton,
+    Spinner,
+    Text,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
 } from '@chakra-ui/react';
 import { Settings2, Save, Eye, Menu } from 'lucide-react';
 import { usePortfolioBuilder } from './hooks/usePortfolioBuilder';
@@ -40,6 +46,8 @@ const PortfolioBuilder = () => {
         caseStudies,
         isEditing,
         editingCaseStudy,
+        isLoading,
+        error,
         updateTheme,
         handleEditCaseStudy,
         handleUpdateCaseStudy,
@@ -51,6 +59,39 @@ const PortfolioBuilder = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isPreviewOpen, onOpen: onPreviewOpen, onClose: onPreviewClose } = useModalDisclosure();
     const toast = useToast();
+
+    // Show loading indicator while data is being fetched
+    if (isLoading) {
+        return (
+            <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="100vh"
+                flexDirection="column"
+            >
+                <Spinner size="xl" thickness="4px" speed="0.65s" color="blue.500" />
+                <Text mt={4} fontSize="lg" fontWeight="medium">
+                    Loading your portfolio...
+                </Text>
+            </Box>
+        );
+    }
+
+    // Show error message if there's an error
+    if (error) {
+        return (
+            <Container maxW="container.md" py={10}>
+                <Alert status="error" borderRadius="md">
+                    <AlertIcon />
+                    <Box>
+                        <AlertTitle>Error loading portfolio</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Box>
+                </Alert>
+            </Container>
+        );
+    }
 
     return (
         <Box minH="100vh" bg="gray.50">

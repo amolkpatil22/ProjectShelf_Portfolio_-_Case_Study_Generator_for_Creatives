@@ -25,6 +25,7 @@ export interface RefreshTokenResponse {
 
 export interface User {
     id: string;
+    portfolioId: string;
     email: string;
     name: string;
     role: string;

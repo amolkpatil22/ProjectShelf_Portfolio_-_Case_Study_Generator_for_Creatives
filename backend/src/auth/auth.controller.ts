@@ -20,7 +20,7 @@ export class AuthController {
         @Request() req,
         @Response({ passthrough: true }) res: ExpressResponse,
     ) {
-        const refreshToken = req.cookies['refresh_token'];
+        const refreshToken = req.cookies['refreshToken'];
         if (!refreshToken) {
             throw new UnauthorizedException('Refresh token not found');
         }

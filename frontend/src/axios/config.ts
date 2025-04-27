@@ -7,25 +7,26 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
 // Request interceptor
-axiosInstance.interceptors.request.use(
-    (config) => {
-        // Get token from localStorage
-        const token = localStorage.getItem('token');
+// axiosInstance.interceptors.request.use(
+//     (config) => {
+//         // Get token from localStorage
+//         const token = localStorage.getItem('token');
 
-        // If token exists, add it to request headers
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+//         // If token exists, add it to request headers
+//         if (token) {
+//             config.headers.Authorization = `Bearer ${token}`;
+//         }
 
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+//         return config;
+//     },
+//     (error) => {
+//         return Promise.reject(error);
+//     }
+// );
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
@@ -45,9 +46,7 @@ axiosInstance.interceptors.response.use(
 
                 if (refreshToken) {
                     // Call refresh token endpoint
-                    const response = await axios.post('/auth/refresh-token', {
-                        refreshToken,
-                    });
+                    const response = await axios.post('/auth/refresh-token');
 
                     const { token } = response.data;
 

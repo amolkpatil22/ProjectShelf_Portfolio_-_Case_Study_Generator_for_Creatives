@@ -10,7 +10,7 @@ import { AuthMiddleware } from '../middleware/auth.middleware';
         UsersModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET,
-            signOptions: { expiresIn: '1h' },
+            signOptions: { expiresIn: '1d' },
         }),
     ],
     controllers: [AuthController],
@@ -24,8 +24,7 @@ export class AuthModule implements NestModule {
             .exclude(
                 { path: 'auth/login', method: RequestMethod.POST },
                 { path: 'users', method: RequestMethod.POST },
-                { path: 'auth/refresh', method: RequestMethod.POST },
-                { path: 'auth/register', method: RequestMethod.POST },
+                { path: 'auth/refresh', method: RequestMethod.POST }
 
             )
             .forRoutes('*');

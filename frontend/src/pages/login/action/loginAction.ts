@@ -4,7 +4,6 @@ import { LoginRequest, ApiResponse, LoginResponse } from '../../../axios/types';
 export const loginUser = async (credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
         const response = await authApi.login(credentials);
-
         // Store the tokens and user data
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem('accessToken', response.accessToken);

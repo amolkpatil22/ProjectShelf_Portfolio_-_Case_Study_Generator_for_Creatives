@@ -32,6 +32,41 @@ export const getPortfolio = async (): Promise<ApiResponse> => {
     }
 };
 
+export const getPortfolioById = async (portfolioId: string): Promise<ApiResponse> => {
+    try {
+        const response = await portfolioApi.get(portfolioId);
+        return {
+            success: true,
+            data: response.data
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            errors: [error.response?.data?.message || 'Failed to fetch portfolio. Please try again.']
+        };
+    }
+};
+
+export const getPortfolioFromLocalStorage = async (): Promise<ApiResponse> => {
+    try {
+        const user = localStorage.getItem('user');
+        const portfolioId = JSON.parse(user || '{}').portfolioId;
+        if (!portfolioId) {
+            return {
+                success: false,
+                errors: ['No portfolio ID found. Please create a portfolio first.']
+            };
+        }
+
+        return await getPortfolioById(portfolioId);
+    } catch (error: any) {
+        return {
+            success: false,
+            errors: [error.message || 'Failed to fetch portfolio. Please try again.']
+        };
+    }
+};
+
 export const saveCaseStudy = async (caseStudy: CaseStudy): Promise<ApiResponse> => {
     try {
         const response = await portfolioApi.update('current', {
